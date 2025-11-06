@@ -1,0 +1,48 @@
+<!doctype html>
+<html class="h-full" lang="en">
+    <head>
+        {% block head %}
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="/static/css/main.css" />
+        <link rel="icon" type="image/png" href="/static/elements/icon.png" />
+
+        <title>{% block title %}{% endblock %} | ClickBuddy</title>
+        {% endblock %}
+    </head>
+    <body class="font-poppins h-full bg-black text-white" id="app">
+        <header class="absolute top-0 z-50 mx-auto w-full bg-[#12121200] backdrop-blur-xl">
+            <div class="mx-auto max-w-7xl px-4">
+                <div class="flex h-20 items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <a href="/polls" class="text-2xl font-bold">
+                            <img class="h-10" src="/static/elements/chars/5.png" alt="" />
+                        </a>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="/#faq" class="flex items-center gap-2">FAQ</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="flex h-full flex-col items-center justify-center gap-4">
+            <img src="/static/elements/chars/3.png" class="size-28" alt="" />
+            <div class="text-5xl">
+                <span class="font-medium">{% block status_code %}{% endblock %}</span>
+                <span class="text-2xl">{% block status_message %}{% endblock %}</span>
+            </div>
+            <a href="/" class="flex items-center justify-center gap-1 text-base text-stone-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                    <path
+                        fill-rule="evenodd"
+                        d="M18 10a.75.75 0 0 1-.75.75H4.66l2.1 1.95a.75.75 0 1 1-1.02 1.1l-3.5-3.25a.75.75 0 0 1 0-1.1l3.5-3.25a.75.75 0 1 1 1.02 1.1l-2.1 1.95h12.59A.75.75 0 0 1 18 10Z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+                <span>Home</span>
+            </a>
+        </main>
+    </body>
+</html>

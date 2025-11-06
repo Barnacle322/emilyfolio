@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "Jost";
+    src: url("../fonts/Jost-VariableFont_wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Unbounded";
+    src: url("../fonts/Unbounded.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Jost";
+    src: url("../fonts/Jost-Italic-VariableFont_wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Press Start 2P";
+    src: url("../fonts/PressStart2P-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+    --font-display: "Jost", sans-serif;
+
+    --font-mono: "Unbounded", monospace;
+}

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- VueJS -->
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+        <!-- GSAP -->
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
+
+        <script type="module" src="/static/js/main.js"></script>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="/static/css/output.css" />
+        <style>
+            .char {
+                display: inline-block;
+            }
+
+            /* Slide transitions */
+            .slide-enter-active {
+                transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .slide-leave-active {
+                transition: all 1s ease-in-out;
+            }
+
+            .slide-enter-from {
+                opacity: 0;
+                filter: blur(10px);
+            }
+
+            .slide-leave-to {
+                opacity: 0;
+                filter: blur(10px);
+            }
+        </style>
+        <title>Emily Yobal | Designer</title>
+    </head>
+    <!-- prettier-ignore -->
+    {% import "components/albumcovers.html" as albumcovers %}
+    {{ albumcovers.render() }}
+    <body
+        class="bg-black text-white font-display flex justify-center items-center min-h-screen relative overflow-x-hidden"
+        id="app"
+    >
+        <header
+            class="mx-auto w-full p-8 flex justify-center items-center fixed top-0 z-50"
+        >
+            <nav
+                class="flex justify-between items-center max-w-3xl gap-16 text-lg"
+            >
+                <a href="#projects">Projects</a>
+                <a href="#about">About Me</a>
+                <a href="#contact">Contact Me</a>
+            </nav>
+        </header>
+
+        <!-- Album covers with slide transition -->
+        <transition name="slide">
+            <album-covers
+                @close="albumcovers = false"
+                v-if="albumcovers"
+            ></album-covers>
+        </transition>
+
+        <main class="relative z-10">
+            <section
+                class="h-screen flex justify-center items-center max-w-7xl flex-col gap-4"
+            >
+                <canvas
+                    id="bg-canvas"
+                    class="absolute w-full h-full -z-10"
+                ></canvas>
+
+                <h1
+                    class="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-mono capitalize"
+                    id="hero-title"
+                ></h1>
+                <h2 class="text-center">
+                    MULTIDISCIPLINARY DESIGNER. INNOVATIVE. 3D MODELLER.
+                </h2>
+            </section>
+            <section
+                class="grid grid-cols-1 sm:grid-col-2 max-w-3xl mx-auto px-8 mt-48"
+            >
+                <ul class="flex flex-col gap-2">
+                    <li
+                        @click="openAlbumCovers"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">ID ALBUM COVERS</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">NAMASTE NONSENSE</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">CLICKBUDDY</span>
+                            <span class="text-sm">PRODUCT DESIGN</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">COOL SODA</span>
+                            <span class="text-sm">BRANDING</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">NAMASTE NONSENSE</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">3D MODELING</span>
+                            <span class="text-sm">PROJECTS</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">2D ANIMATION</span>
+                            <span class="text-sm">PROJECTS</span>
+                        </div>
+                    </li>
+                    <li
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                        >
+                            <span class="text-lg">NECOLOCO</span>
+                            <span class="text-sm">UI/UX DESIGN</span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <section
+                id="skills"
+                class="font-mono p-8 mt-64 text-justify sm:text-center flex justify-center items-center max-w-5xl text-lg md:text-xl xl:text-3xl mx-auto h-[50vh]"
+            >
+                <p id="skills-text" class="cursor-default">
+                    UI/UX DESIGN, GRAPHIC DESIGN, ILLUSTRATION, CHARACTER
+                    DESIGN, PACKAGING DESIGN, BRANDING, CONCEPTUAL ART, 3D,
+                    MOTION DESIGN, STORYBOARDING.
+                </p>
+            </section>
+            <section
+                class="p-8 text-center flex justify-center items-center max-w-4xl mx-auto"
+            >
+                <p>
+                    I'm a self-taught creative designer focused on crafting
+                    visuals that express emotion, story, and purpose — from
+                    sketches and illustrations to 3D design, motion, and
+                    animation.
+                    <br />
+                    <br />
+
+                    I've collaborated with startups in the D2C and Kickstarter
+                    space, developing brand identities and visual storytelling
+                    that connect with people.
+                    <br />
+                    <br />
+                    I also worked with Immortal Dragons, a longevity-focused
+                    organization developing Digital Twins — lifelike 3D models
+                    that mirror a person's physical self. As a 3D designer, I
+                    helped create and refine these models and supported side
+                    projects such as podcast visuals and brand design.
+                    <br />
+                    <br />
+                    If you'd like to connect or collaborate, feel free to reach
+                    out at
+                    <a href="mailto:its.emilynxx@gmail.com" class="underline"
+                        >its.emilynxx@gmail.com</a
+                    >. I'm always open to new creative opportunities.
+                </p>
+            </section>
+            <section
+                class="font-mono p-8 text-center flex gap-10 flex-col justify-center items-center max-w-5xl text-3xl mx-auto h-[50vh]"
+            >
+                <h2>YOU CAN FIND ME ON</h2>
+                <ul class="flex gap-10 font-display text-lg">
+                    <a href="">LinkedIn</a>
+                    <a href="">Mail</a>
+                    <a href="">Instagram</a>
+                </ul>
+            </section>
+        </main>
+        <!-- Three.js Canvas Background -->
+    </body>
+</html>
