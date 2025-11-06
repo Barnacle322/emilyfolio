@@ -2,408 +2,6 @@ import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
 const { createApp, markRaw } = Vue;
 
-const backgroundSettings = {
-    color1: "#ff",
-    color2: "#ee11dd",
-    color3: "#5EF4EA",
-    renderScale: 1,
-    maxPixelRatio: 1.5,
-};
-
-const BASE_VERTEX_SHADER = `
-precision highp float;
-varying vec2 vUv;
-
-void main() {
-    vUv = uv;
-    gl_Position = vec4(position, 1.0);
-}
-`;
-
-const COMPUTE_FRAGMENT_SHADER = `
-precision highp float;
-varying vec2 vUv;
-
-uniform sampler2D uPreviousResult;
-uniform vec2 uSize;
-uniform vec2 uPointerPos;
-uniform float uPointerDown;
-uniform float uTime;
-uniform float uDeltaTime;
-uniform vec2 uComputeResolution;
-
-float gaussianFalloff(float dist, float radius) {
-    float r = max(radius, 0.0001);
-    return exp(-pow(dist / r, 2.0));
-}
-
-void main() {
-    vec2 texel = 1.0 / max(uComputeResolution, vec2(1.0));
-    float center = texture2D(uPreviousResult, vUv).r;
-    float sum = 0.0;
-    sum += texture2D(uPreviousResult, vUv + vec2(texel.x, 0.0)).r;
-    sum += texture2D(uPreviousResult, vUv - vec2(texel.x, 0.0)).r;
-    sum += texture2D(uPreviousResult, vUv + vec2(0.0, texel.y)).r;
-    sum += texture2D(uPreviousResult, vUv - vec2(0.0, texel.y)).r;
-    float diffusion = (sum * 0.25 - center) * 0.35;
-
-    float value = center + diffusion;
-    value *= exp(-1.5 * uDeltaTime);
-
-    vec2 pointerUv = uPointerPos / max(uSize, vec2(1.0));
-    float drop = gaussianFalloff(distance(vUv, pointerUv), 0.03) * uPointerDown;
-    value += drop;
-
-    value = clamp(value, 0.0, 1.0);
-    gl_FragColor = vec4(value, value, value, 1.0);
-}
-`;
-
-const RENDER_FRAGMENT_SHADER = `
-precision highp float;
-varying vec2 vUv;
-
-uniform sampler2D uGradientMap;
-uniform sampler2D uComputeResult;
-uniform vec2 uSize;
-uniform vec2 uPointerPos;
-uniform float uPointerDown;
-uniform float uTime;
-
-float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
-vec3 mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec2 mod289(vec2 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec3 permute(vec3 x) {
-    return mod289(((x * 34.0) + 1.0) * x);
-}
-
-float snoise(vec2 v) {
-    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-    vec2 i = floor(v + dot(v, C.yy));
-    vec2 x0 = v - i + dot(i, C.xx);
-    vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
-    i = mod289(i);
-    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
-    vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
-    m *= m;
-    m *= m;
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-    vec3 g;
-    g.x = a0.x * x0.x + h.x * x0.y;
-    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    return 130.0 * dot(m, g);
-}
-
-void main() {
-    float flow = texture2D(uComputeResult, vUv).r;
-    vec2 warp = (vUv - 0.5) * flow * 0.18;
-
-    float timeShift = sin(uTime * 0.35 + vUv.y * 5.0) * 0.02;
-    float layerWave = snoise(vec2(vUv.x * 0.5 + uTime * 0.1, vUv.y * 4.0 - uTime * 0.08)) * 0.05;
-    float verticalSweep = snoise(vec2(vUv.x * 1.4 + uTime * 0.05, vUv.y * 1.2 - uTime * 0.03)) * 0.4;
-
-    float baseGradient = 1.0 - vUv.y;
-    float gradientPos = clamp(baseGradient + warp.y + timeShift + layerWave + verticalSweep * 0.15, 0.0, 1.0);
-
-    vec4 base = texture2D(uGradientMap, vec2(gradientPos, 0.5));
-
-    vec2 pointerUv = uPointerPos / max(uSize, vec2(1.0));
-    float pointerGlow = smoothstep(0.18, 0.0, distance(vUv, pointerUv)) * uPointerDown;
-
-    float shimmer = (random(vUv * 8.0 + uTime * 0.05) - 0.5) * 0.035;
-    float ambientPulse = sin(uTime * 0.4 + vUv.y * 6.28318) * 0.02;
-    vec3 waveTint = vec3(0.12, 0.04, 0.18) * verticalSweep;
-
-    vec3 color = base.rgb;
-    color += flow * vec3(0.18, -0.04, 0.22);
-    color += pointerGlow * vec3(0.25, 0.05, 0.3);
-    color += waveTint;
-    color += shimmer;
-    color += ambientPulse;
-
-    color = mix(base.rgb, color, 0.82);
-
-    gl_FragColor = vec4(clamp(color, 0.0, 1.0), base.a);
-}
-`;
-
-function getSupportedRenderTargetType(renderer) {
-    const extensions = renderer.extensions;
-    const { capabilities } = renderer;
-
-    if (capabilities.isWebGL2) {
-        if (extensions.has("EXT_color_buffer_float")) {
-            return THREE.FloatType;
-        }
-        if (extensions.has("EXT_color_buffer_half_float")) {
-            return THREE.HalfFloatType;
-        }
-        return THREE.UnsignedByteType;
-    }
-
-    if (
-        extensions.has("OES_texture_float") &&
-        extensions.has("WEBGL_color_buffer_float")
-    ) {
-        return THREE.FloatType;
-    }
-
-    if (
-        extensions.has("OES_texture_half_float") &&
-        extensions.has("EXT_color_buffer_half_float")
-    ) {
-        return THREE.HalfFloatType;
-    }
-
-    return THREE.UnsignedByteType;
-}
-
-class FluidEffect {
-    constructor(renderer, gradientMapTexture, width, height) {
-        this.renderer = renderer;
-        this.gradientMapTexture = gradientMapTexture;
-        this.width = width;
-        this.height = height;
-        this.time = 0;
-        this.pointerIsDown = false;
-        this.pointerPulse = 0;
-
-        const type = getSupportedRenderTargetType(renderer);
-        const fboWidth = Math.max(1, Math.floor(width * 0.1));
-        const fboHeight = Math.max(1, Math.floor(height * 0.1));
-
-        this.computeResolution = new THREE.Vector2(fboWidth, fboHeight);
-
-        const commonTextureSettings = {
-            generateMipmaps: false,
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            format: THREE.RGBAFormat,
-            type,
-            depthBuffer: false,
-            stencilBuffer: false,
-        };
-
-        this.computeTargetA = new THREE.WebGLRenderTarget(
-            fboWidth,
-            fboHeight,
-            commonTextureSettings
-        );
-        this.computeTargetB = new THREE.WebGLRenderTarget(
-            fboWidth,
-            fboHeight,
-            commonTextureSettings
-        );
-        this.currentTarget = this.computeTargetA;
-
-        this.computeCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-        this.computeMat = new THREE.ShaderMaterial({
-            uniforms: {
-                uSize: { value: new THREE.Vector2(width, height) },
-                uPointerPos: { value: new THREE.Vector2(0, 0) },
-                uPointerDown: { value: 0 },
-                uTime: { value: 0 },
-                uDeltaTime: { value: 0 },
-                uPreviousResult: { value: this.computeTargetB.texture },
-                uComputeResolution: { value: this.computeResolution.clone() },
-            },
-            vertexShader: BASE_VERTEX_SHADER,
-            fragmentShader: COMPUTE_FRAGMENT_SHADER,
-        });
-
-        this.computeScene = new THREE.Scene();
-        const computeMesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(2, 2),
-            this.computeMat
-        );
-        this.computeScene.add(computeMesh);
-
-        this.planeMat = new THREE.ShaderMaterial({
-            uniforms: {
-                uGradientMap: { value: gradientMapTexture },
-                uComputeResult: { value: this.computeTargetA.texture },
-                uTime: { value: 0 },
-                uSize: { value: new THREE.Vector2(width, height) },
-                uPointerPos: { value: new THREE.Vector2(0, 0) },
-                uPointerDown: { value: 0 },
-            },
-            vertexShader: BASE_VERTEX_SHADER,
-            fragmentShader: RENDER_FRAGMENT_SHADER,
-            transparent: true,
-            depthTest: false,
-            depthWrite: false,
-        });
-
-        this.visibleMesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(2, 2),
-            this.planeMat
-        );
-
-        this._clearTargets();
-    }
-
-    _clearTargets() {
-        const prevTarget = this.renderer.getRenderTarget();
-        const prevColor = this.renderer.getClearColor(new THREE.Color());
-        const prevAlpha = this.renderer.getClearAlpha();
-
-        this.renderer.setClearColor(0x000000, 0);
-        this.renderer.setRenderTarget(this.computeTargetA);
-        this.renderer.clear(true, true, true);
-        this.renderer.setRenderTarget(this.computeTargetB);
-        this.renderer.clear(true, true, true);
-        this.renderer.setRenderTarget(prevTarget);
-        this.renderer.setClearColor(prevColor, prevAlpha);
-    }
-
-    setPointer(x, y) {
-        this.computeMat.uniforms.uPointerPos.value.set(x, y);
-        this.planeMat.uniforms.uPointerPos.value.set(x, y);
-    }
-
-    setPointerDown(isDown) {
-        this.pointerIsDown = isDown;
-        if (isDown) {
-            this.pointerPulse = 1;
-        } else {
-            this.pointerPulse = Math.max(this.pointerPulse, 0.2);
-        }
-    }
-
-    pulse(strength = 0.3) {
-        this.pointerPulse = Math.min(1, this.pointerPulse + strength);
-    }
-
-    onResize(width, height) {
-        this.width = width;
-        this.height = height;
-
-        this.computeMat.uniforms.uSize.value.set(width, height);
-        this.planeMat.uniforms.uSize.value.set(width, height);
-
-        const fboWidth = Math.max(1, Math.floor(width * 0.1));
-        const fboHeight = Math.max(1, Math.floor(height * 0.1));
-        this.computeResolution.set(fboWidth, fboHeight);
-        this.computeMat.uniforms.uComputeResolution.value.set(
-            fboWidth,
-            fboHeight
-        );
-
-        this.computeTargetA.setSize(fboWidth, fboHeight);
-        this.computeTargetB.setSize(fboWidth, fboHeight);
-
-        this._clearTargets();
-    }
-
-    update(deltaTime) {
-        const safeDelta = Math.max(deltaTime, 0);
-        this.time += safeDelta;
-
-        this.pointerPulse = Math.max(
-            0,
-            this.pointerPulse - safeDelta * (this.pointerIsDown ? 0.4 : 1.2)
-        );
-        const pointerStrength = this.pointerIsDown ? 1.0 : this.pointerPulse;
-
-        this.computeMat.uniforms.uTime.value = this.time;
-        this.computeMat.uniforms.uDeltaTime.value = safeDelta;
-        this.computeMat.uniforms.uPointerDown.value = pointerStrength;
-        this.planeMat.uniforms.uTime.value = this.time;
-        this.planeMat.uniforms.uPointerDown.value = pointerStrength;
-
-        const inputTarget = this.currentTarget;
-        const outputTarget =
-            inputTarget === this.computeTargetA
-                ? this.computeTargetB
-                : this.computeTargetA;
-
-        this.computeMat.uniforms.uPreviousResult.value = outputTarget.texture;
-
-        this.renderer.setRenderTarget(inputTarget);
-        this.renderer.render(this.computeScene, this.computeCamera);
-
-        this.planeMat.uniforms.uComputeResult.value = inputTarget.texture;
-
-        this.currentTarget = outputTarget;
-    }
-
-    dispose() {
-        this.computeTargetA.dispose();
-        this.computeTargetB.dispose();
-        this.computeMat.dispose();
-        this.planeMat.dispose();
-        this.visibleMesh.geometry.dispose();
-    }
-}
-
-function createGradientTexture() {
-    const size = 256;
-    const data = new Uint8Array(size * 4);
-    const stops = [
-        { offset: 0, color: new THREE.Color(backgroundSettings.color1) },
-        { offset: 0.5, color: new THREE.Color(backgroundSettings.color2) },
-        { offset: 1, color: new THREE.Color(backgroundSettings.color3) },
-    ];
-
-    for (let i = 0; i < size; i += 1) {
-        const t = i / (size - 1);
-
-        let start = stops[0];
-        let end = stops[stops.length - 1];
-
-        for (let j = 0; j < stops.length - 1; j += 1) {
-            const current = stops[j];
-            const next = stops[j + 1];
-            if (t >= current.offset && t <= next.offset) {
-                start = current;
-                end = next;
-                break;
-            }
-        }
-
-        const range = Math.max(end.offset - start.offset, 0.0001);
-        const localT = THREE.MathUtils.clamp((t - start.offset) / range, 0, 1);
-        const color = start.color.clone().lerp(end.color, localT);
-        const stride = i * 4;
-        data[stride] = Math.round(color.r * 255);
-        data[stride + 1] = Math.round(color.g * 255);
-        data[stride + 2] = Math.round(color.b * 255);
-        data[stride + 3] = 255;
-    }
-
-    const texture = new THREE.DataTexture(
-        data,
-        size,
-        1,
-        THREE.RGBAFormat,
-        THREE.UnsignedByteType
-    );
-    texture.needsUpdate = true;
-    texture.magFilter = THREE.LinearFilter;
-    texture.minFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
-    texture.flipY = false;
-    texture.wrapS = THREE.ClampToEdgeWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    return texture;
-}
-
 const AlbumCovers = {
     template: "#albumcovers",
 };
@@ -417,14 +15,27 @@ createApp({
             gradientTexture: null,
             fluidEffect: null,
             albumcovers: false,
-            renderScale: backgroundSettings.renderScale,
+            renderScale:
+                typeof backgroundSettings !== "undefined"
+                    ? backgroundSettings.renderScale
+                    : 1.0,
             canvasWidth: Math.max(
                 1,
-                Math.round(window.innerWidth * backgroundSettings.renderScale)
+                Math.round(
+                    window.innerWidth *
+                        (typeof backgroundSettings !== "undefined"
+                            ? backgroundSettings.renderScale
+                            : 1.0)
+                )
             ),
             canvasHeight: Math.max(
                 1,
-                Math.round(window.innerHeight * backgroundSettings.renderScale)
+                Math.round(
+                    window.innerHeight *
+                        (typeof backgroundSettings !== "undefined"
+                            ? backgroundSettings.renderScale
+                            : 1.0)
+                )
             ),
             animationFrameId: null,
             lastFrameTime: null,
@@ -450,164 +61,294 @@ createApp({
         closeAlbumCovers() {
             this.albumcovers = false;
         },
-        initBackground() {
-            const canvas = document.getElementById("bg-canvas");
-            if (!canvas) {
-                return;
-            }
 
+        initBackground() {
+            // Initialize Three.js scene
             this.scene = markRaw(new THREE.Scene());
+
+            // Setup camera
             this.camera = markRaw(
                 new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
             );
+
+            // Setup renderer
+            const canvas = document.getElementById("bg-canvas");
             this.renderer = markRaw(
                 new THREE.WebGLRenderer({
-                    canvas,
-                    alpha: true,
-                    antialias: true,
+                    canvas: canvas,
+                    alpha: false,
+                    antialias: false,
                     powerPreference: "high-performance",
                 })
             );
-            this.handleResize();
 
-            this.gradientTexture = createGradientTexture();
+            this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+            this.renderer.setPixelRatio(1);
 
-            this.fluidEffect = markRaw(
-                new FluidEffect(
-                    this.renderer,
-                    this.gradientTexture,
-                    this.canvasWidth,
-                    this.canvasHeight
-                )
-            );
-            this.scene.add(this.fluidEffect.visibleMesh);
+            // Create gradient shader material
+            const gradientMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uResolution: {
+                        value: new THREE.Vector2(
+                            this.canvasWidth,
+                            this.canvasHeight
+                        ),
+                    },
+                    uPointer: { value: new THREE.Vector2(0.5, 0.5) },
+                    uPointerDown: { value: 0.0 },
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uTime;
+                    uniform vec2 uResolution;
+                    uniform vec2 uPointer;
+                    uniform float uPointerDown;
+                    varying vec2 vUv;
+                    
+                    // Simplex noise functions
+                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                    
+                    float snoise(vec2 v) {
+                        const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                        vec2 i  = floor(v + dot(v, C.yy));
+                        vec2 x0 = v - i + dot(i, C.xx);
+                        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                        vec4 x12 = x0.xyxy + C.xxzz;
+                        x12.xy -= i1;
+                        i = mod289(i);
+                        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+                        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                        m = m*m;
+                        m = m*m;
+                        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                        vec3 h = abs(x) - 0.5;
+                        vec3 ox = floor(x + 0.5);
+                        vec3 a0 = x - ox;
+                        m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                        vec3 g;
+                        g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                        return 130.0 * dot(m, g);
+                    }
+                    
+                    // Fractal Brownian Motion for more organic waves
+                    float fbm(vec2 p) {
+                        float value = 0.0;
+                        float amplitude = 0.5;
+                        float frequency = 1.0;
+                        
+                        for(int i = 0; i < 5; i++) {
+                            value += amplitude * snoise(p * frequency);
+                            frequency *= 2.0;
+                            amplitude *= 0.5;
+                        }
+                        return value;
+                    }
+                    
+                    // Enhanced dithering for that grainy diffused look
+                    float dither(vec2 coord) {
+                        // Blue noise pattern
+                        float noise1 = fract(sin(dot(coord, vec2(12.9898, 78.233))) * 43758.5453);
+                        float noise2 = fract(sin(dot(coord, vec2(93.9898, 67.345))) * 23421.6312);
+                        return (noise1 + noise2) * 0.015 - 0.015;
+                    }
+                    
+                    void main() {
+                        vec2 uv = vUv;
+                        vec2 resolution = uResolution;
+                        
+                        // Adjust UV for aspect ratio
+                        vec2 aspectUv = uv;
+                        float aspect = resolution.x / resolution.y;
+                        aspectUv.x *= aspect;
+                        
+                        // Slow time for breathing effect
+                        float time = uTime * 0.08;
+                        
+                        // Create complex wave distortion using FBM
+                        vec2 distortion1 = vec2(
+                            fbm(aspectUv * 1.5 + vec2(time * 0.4, time * 0.3)),
+                            fbm(aspectUv * 1.5 + vec2(time * 0.3, -time * 0.4))
+                        );
+                        
+                        vec2 distortion2 = vec2(
+                            fbm(aspectUv * 0.8 + distortion1 * 0.3 + time * 0.2),
+                            fbm(aspectUv * 0.8 + distortion1 * 0.3 - time * 0.15)
+                        );
+                        
+                        // Apply layered distortion for wave diffusion
+                        vec2 finalUv = aspectUv + distortion1 * 0.12 + distortion2 * 0.08;
+                        
+                        // Create the main gradient flow
+                        float gradientFlow = finalUv.x * 0.6 + finalUv.y * 0.8;
+                        
+                        // Add wave motion
+                        float wave1 = fbm(finalUv * 2.0 + time * 0.3) * 0.15;
+                        float wave2 = fbm(finalUv * 1.2 - time * 0.2) * 0.1;
+                        
+                        gradientFlow += wave1 + wave2;
+                        
+                        // Pointer interaction
+                        vec2 pointerInfluence = (uv - uPointer) * 1.5;
+                        float pointerDist = length(pointerInfluence);
+                        float pointerEffect = smoothstep(0.8, 0.0, pointerDist) * uPointerDown * 0.12;
+                        gradientFlow += pointerEffect;
+                        
+                        // Color palette matching the reference image
+                        vec3 color1 = vec3(0.02, 0.05, 0.15);  // Deep dark blue
+                        vec3 color2 = vec3(0.15, 0.08, 0.28);  // Dark purple-blue
+                        vec3 color3 = vec3(0.45, 0.12, 0.18);  // Deep magenta-red
+                        vec3 color4 = vec3(0.85, 0.25, 0.15);  // Bright red-orange
+                        vec3 color5 = vec3(0.95, 0.55, 0.25);  // Light orange
+                        vec3 color6 = vec3(0.98, 0.75, 0.45);  // Pale orange/yellow
+                        
+                        // Smooth multi-step gradient
+                        vec3 finalColor;
+                        float t = gradientFlow;
+                        
+                        if (t < 0.2) {
+                            finalColor = mix(color1, color2, smoothstep(0.0, 0.2, t));
+                        } else if (t < 0.4) {
+                            finalColor = mix(color2, color3, smoothstep(0.2, 0.4, t));
+                        } else if (t < 0.6) {
+                            finalColor = mix(color3, color4, smoothstep(0.4, 0.6, t));
+                        } else if (t < 0.75) {
+                            finalColor = mix(color4, color5, smoothstep(0.6, 0.75, t));
+                        } else if (t < 0.9) {
+                            finalColor = mix(color5, color6, smoothstep(0.75, 0.9, t));
+                        } else {
+                            finalColor = mix(color6, color5, smoothstep(0.9, 1.1, t));
+                        }
+                        
+                        // Add subtle color variations based on noise
+                        vec3 colorNoise = vec3(
+                            snoise(finalUv * 3.0 + time * 0.1),
+                            snoise(finalUv * 3.0 + time * 0.1 + 100.0),
+                            snoise(finalUv * 3.0 + time * 0.1 + 200.0)
+                        ) * 0.03;
+                        
+                        finalColor += colorNoise;
+                        
+                        // Add brightness variation for depth
+                        float brightness = 1.0 + snoise(finalUv * 2.5 + time * 0.15) * 0.08;
+                        finalColor *= brightness;
+                        
+                        // Apply grain/dither texture for diffused look
+                        float grain = dither(gl_FragCoord.xy);
+                        finalColor += grain;
+                        
+                        // Slight vignette for depth
+                        float vignette = 1.0 - length(uv - 0.5) * 0.3;
+                        finalColor *= vignette;
+                        
+                        // Ensure colors stay in valid range
+                        finalColor = clamp(finalColor, 0.0, 1.0);
+                        
+                        gl_FragColor = vec4(finalColor, 1.0);
+                    }
+                `,
+            });
 
-            this.pointerX = this.canvasWidth * 0.5;
-            this.pointerY = this.canvasHeight * 0.5;
-            this.fluidEffect.setPointer(this.pointerX, this.pointerY);
+            // Create full-screen quad
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const mesh = markRaw(new THREE.Mesh(geometry, gradientMaterial));
+            this.scene.add(mesh);
 
-            this.resizeHandler = () => this.handleResize();
-            window.addEventListener("resize", this.resizeHandler);
+            this.gradientTexture = gradientMaterial;
 
-            this.pointerMoveHandler = (event) => this.handlePointerMove(event);
-            this.pointerDownHandler = (event) => this.handlePointerDown(event);
-            this.pointerUpHandler = () => this.handlePointerUp();
+            // Setup event handlers
+            this.setupEventHandlers();
 
+            // Start animation loop
+            this.animate();
+        },
+
+        setupEventHandlers() {
+            // Pointer move handler - now activates on hover
+            this.pointerMoveHandler = (e) => {
+                if (this.gradientTexture) {
+                    this.pointerX = e.clientX / window.innerWidth;
+                    this.pointerY = 1.0 - e.clientY / window.innerHeight;
+                    this.pointerIsDown = true; // Activate on hover
+                }
+            };
             window.addEventListener("pointermove", this.pointerMoveHandler);
-            window.addEventListener("pointerdown", this.pointerDownHandler);
-            window.addEventListener("pointerup", this.pointerUpHandler);
-            window.addEventListener("pointercancel", this.pointerUpHandler);
+
+            // Pointer leave handler to deactivate when mouse leaves
+            this.pointerUpHandler = () => {
+                this.pointerIsDown = false;
+            };
             window.addEventListener("pointerleave", this.pointerUpHandler);
 
-            this.blurHandler = () => this.handlePointerUp();
+            // Window blur handler
+            this.blurHandler = () => {
+                this.pointerIsDown = false;
+            };
             window.addEventListener("blur", this.blurHandler);
 
-            this.lastFrameTime = performance.now();
-            this.animationFrameId = requestAnimationFrame(this.animate);
+            // Resize handler
+            this.resizeHandler = () => {
+                this.canvasWidth = Math.max(
+                    1,
+                    Math.round(window.innerWidth * this.renderScale)
+                );
+                this.canvasHeight = Math.max(
+                    1,
+                    Math.round(window.innerHeight * this.renderScale)
+                );
+
+                if (this.renderer) {
+                    this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+                }
+
+                if (this.gradientTexture) {
+                    this.gradientTexture.uniforms.uResolution.value.set(
+                        this.canvasWidth,
+                        this.canvasHeight
+                    );
+                }
+            };
+            window.addEventListener("resize", this.resizeHandler);
         },
 
-        animate(now = performance.now()) {
+        animate() {
             this.animationFrameId = requestAnimationFrame(this.animate);
 
-            const delta =
-                this.lastFrameTime === null
-                    ? 0
-                    : Math.max((now - this.lastFrameTime) / 1000, 0);
-            this.lastFrameTime = now;
+            const currentTime = performance.now() / 1000;
 
-            if (this.fluidEffect) {
-                this.fluidEffect.update(delta);
+            if (this.gradientTexture) {
+                // Update time uniform
+                this.gradientTexture.uniforms.uTime.value = currentTime;
+
+                // Smoothly update pointer position
+                const currentPointer =
+                    this.gradientTexture.uniforms.uPointer.value;
+                currentPointer.x += (this.pointerX - currentPointer.x) * 0.1;
+                currentPointer.y += (this.pointerY - currentPointer.y) * 0.1;
+
+                // Smoothly update pointer down state
+                const targetDown = this.pointerIsDown ? 1.0 : 0.0;
+                const currentDown =
+                    this.gradientTexture.uniforms.uPointerDown.value;
+                this.gradientTexture.uniforms.uPointerDown.value +=
+                    (targetDown - currentDown) * 0.1;
             }
 
+            // Render the scene
             if (this.renderer && this.scene && this.camera) {
-                this.renderer.setRenderTarget(null);
                 this.renderer.render(this.scene, this.camera);
             }
-        },
 
-        handleResize() {
-            if (!this.renderer) {
-                return;
-            }
-
-            this.renderer.setPixelRatio(
-                Math.min(
-                    window.devicePixelRatio,
-                    backgroundSettings.maxPixelRatio || window.devicePixelRatio
-                )
-            );
-
-            this.renderScale = backgroundSettings.renderScale || 1;
-
-            const previousWidth = this.canvasWidth;
-            const previousHeight = this.canvasHeight;
-
-            this.canvasWidth = Math.max(
-                1,
-                Math.round(window.innerWidth * this.renderScale)
-            );
-            this.canvasHeight = Math.max(
-                1,
-                Math.round(window.innerHeight * this.renderScale)
-            );
-
-            this.renderer.setSize(this.canvasWidth, this.canvasHeight, false);
-
-            const rendererCanvas = this.renderer.domElement;
-            rendererCanvas.style.width = `${window.innerWidth}px`;
-            rendererCanvas.style.height = `${window.innerHeight}px`;
-
-            if (previousWidth > 0 && previousHeight > 0) {
-                const normalizedX = this.pointerX / previousWidth;
-                const normalizedY = this.pointerY / previousHeight;
-                this.pointerX = normalizedX * this.canvasWidth;
-                this.pointerY = normalizedY * this.canvasHeight;
-            } else {
-                this.pointerX = this.canvasWidth * 0.5;
-                this.pointerY = this.canvasHeight * 0.5;
-            }
-
-            if (this.fluidEffect) {
-                this.fluidEffect.onResize(this.canvasWidth, this.canvasHeight);
-                this.fluidEffect.setPointer(this.pointerX, this.pointerY);
-            }
-        },
-
-        handlePointerMove(event) {
-            if (!this.fluidEffect) {
-                return;
-            }
-
-            const viewportWidth = Math.max(window.innerWidth, 1);
-            const viewportHeight = Math.max(window.innerHeight, 1);
-
-            const x = (event.clientX / viewportWidth) * this.canvasWidth;
-            const y = (event.clientY / viewportHeight) * this.canvasHeight;
-
-            this.pointerX = THREE.MathUtils.clamp(x, 0, this.canvasWidth);
-            this.pointerY = THREE.MathUtils.clamp(
-                this.canvasHeight - y,
-                0,
-                this.canvasHeight
-            );
-
-            this.fluidEffect.setPointer(this.pointerX, this.pointerY);
-            this.fluidEffect.pulse(this.pointerIsDown ? 0.6 : 0.3);
-        },
-
-        handlePointerDown(event) {
-            this.pointerIsDown = true;
-            if (this.fluidEffect) {
-                this.fluidEffect.setPointerDown(true);
-            }
-            this.handlePointerMove(event);
-        },
-
-        handlePointerUp() {
-            this.pointerIsDown = false;
-            if (this.fluidEffect) {
-                this.fluidEffect.setPointerDown(false);
-            }
+            this.lastFrameTime = currentTime;
         },
 
         animateTitle() {
@@ -730,14 +471,7 @@ createApp({
             this.pointerMoveHandler = null;
         }
 
-        if (this.pointerDownHandler) {
-            window.removeEventListener("pointerdown", this.pointerDownHandler);
-            this.pointerDownHandler = null;
-        }
-
         if (this.pointerUpHandler) {
-            window.removeEventListener("pointerup", this.pointerUpHandler);
-            window.removeEventListener("pointercancel", this.pointerUpHandler);
             window.removeEventListener("pointerleave", this.pointerUpHandler);
             this.pointerUpHandler = null;
         }
