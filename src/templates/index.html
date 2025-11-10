@@ -20,10 +20,7 @@
             property="og:description"
             content="Multidisciplinary designer specialising in UI/UX, motion, and 2D/3D brand systems. I help small businesses grow with conversion-focused visuals, from first idea to launch-ready products."
         />
-        <meta
-            property="og:image"
-            content="https://metatags.io/images/meta-tags.png"
-        />
+        <meta property="og:image" content="/static/favicon/meta.png" />
 
         <!-- X (Twitter) -->
         <meta property="twitter:card" content="summary_large_image" />
@@ -33,10 +30,7 @@
             property="twitter:description"
             content="Multidisciplinary designer specialising in UI/UX, motion, and 2D/3D brand systems. I help small businesses grow with conversion-focused visuals, from first idea to launch-ready products."
         />
-        <meta
-            property="twitter:image"
-            content="https://metatags.io/images/meta-tags.png"
-        />
+        <meta property="twitter:image" content="/static/favicon/meta.png" />
 
         <!-- Meta Tags Generated with https://metatags.io -->
 
@@ -70,44 +64,23 @@
 
         <!-- CSS -->
         <link rel="stylesheet" href="/static/css/output.css" />
-        <style>
-            .char {
-                display: inline-block;
-            }
-
-            /* Slide transitions */
-            .slide-enter-active {
-                transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-
-            .slide-leave-active {
-                transition: all 1s ease-in-out;
-            }
-
-            .slide-enter-from {
-                opacity: 0;
-                filter: blur(10px);
-            }
-
-            .slide-leave-to {
-                opacity: 0;
-                filter: blur(10px);
-            }
-        </style>
         <title>Emily Yobal | Designer</title>
     </head>
     <!-- prettier-ignore -->
     {% import "components/albumcovers.html" as albumcovers %}
     {{ albumcovers.render() }}
+    {% import "components/namaste.html" as namaste %}
+    {{ namaste.render() }}
     <body
-        class="bg-black text-white font-display flex justify-center items-center min-h-screen relative overflow-x-hidden"
+        class="bg-black scroll-smooth text-white font-display flex justify-center items-center min-h-screen relative overflow-x-hidden"
         id="app"
     >
         <header
             class="mx-auto w-full p-8 flex justify-center items-center fixed top-0 z-50"
         >
             <nav
-                class="flex justify-between items-center max-w-3xl gap-16 text-lg"
+                style="animation-delay: 2000ms"
+                class="move-down flex justify-between items-center max-w-3xl gap-16 text-lg uppercase tracking-wide"
             >
                 <a href="#projects">Projects</a>
                 <a href="#about">About Me</a>
@@ -122,6 +95,10 @@
                 v-if="albumcovers"
             ></album-covers>
         </transition>
+        <!-- Album covers with slide transition -->
+        <transition name="slide">
+            <namaste @close="namaste = false" v-if="namaste"></namaste>
+        </transition>
 
         <main class="relative z-10">
             <section
@@ -133,183 +110,441 @@
                 ></canvas>
 
                 <h1
-                    class="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-mono capitalize"
+                    class="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-mono font-bold capitalize"
                     id="hero-title"
                 ></h1>
-                <h2 class="text-center">
+                <h2
+                    class="text-center font-medium move-up"
+                    style="animation-delay: 1500ms"
+                >
                     MULTIDISCIPLINARY DESIGNER. INNOVATIVE. 3D MODELLER.
                 </h2>
             </section>
             <section
-                class="grid grid-cols-1 sm:grid-col-2 max-w-3xl mx-auto px-8 mt-48"
+                class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto px-8 mt-48 scroll-mt-48 font-medium"
+                id="projects"
             >
-                <ul class="flex flex-col gap-2">
-                    <li
-                        @click="openAlbumCovers"
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                <div class="order-2 lg:order-1">
+                    <ul class="flex flex-col gap-2">
+                        <li
+                            @click="openAlbumCovers"
+                            @mouseenter="previewProject('albumcovers')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">ID ALBUM COVERS</span>
-                            <span class="text-sm">ILLUSTRATION</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">ID ALBUM COVERS</span>
+                                <span class="text-sm">ILLUSTRATION</span>
+                            </div>
+                        </li>
+                        <li
+                            @click="openNamaste"
+                            @mouseenter="previewProject('namaste')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">NAMASTE NONSENSE</span>
-                            <span class="text-sm">ILLUSTRATION</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">NAMASTE NONSENSE</span>
+                                <span class="text-sm">ILLUSTRATION</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('aiapp')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">CLICKBUDDY</span>
-                            <span class="text-sm">PRODUCT DESIGN</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">AI APP</span>
+                                <span class="text-sm">CHARACTER DESIGN</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('clickbuddy')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">COOL SODA</span>
-                            <span class="text-sm">BRANDING</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">CLICKBUDDY</span>
+                                <span class="text-sm"
+                                    >PRODUCT & BRAND DESIGN</span
+                                >
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('necoloco')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">NAMASTE NONSENSE</span>
-                            <span class="text-sm">ILLUSTRATION</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">NECOLOCO</span>
+                                <span class="text-sm">UI/UX</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('twin')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">3D MODELING</span>
-                            <span class="text-sm">PROJECTS</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">DIGITAL TWIN</span>
+                                <span class="text-sm">3D MODELLING</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('threed')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">2D ANIMATION</span>
-                            <span class="text-sm">PROJECTS</span>
-                        </div>
-                    </li>
-                    <li
-                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
-                    >
-                        <img
-                            src="/static/elements/open-folder.svg"
-                            class="size-5 hidden group-hover:block"
-                            alt=""
-                        />
-                        <img
-                            src="/static/elements/closed-folder.svg"
-                            class="size-5 group-hover:hidden"
-                            alt=""
-                        />
-                        <div
-                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">PERSONAL WORK</span>
+                                <span class="text-sm">3D MODELLING</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('corners')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
-                            <span class="text-lg">NECOLOCO</span>
-                            <span class="text-sm">UI/UX DESIGN</span>
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">ID CORNER FRAMES</span>
+                                <span class="text-sm">ILLUSTRATION</span>
+                            </div>
+                        </li>
+                        <li
+                            @mouseenter="previewProject('story')"
+                            @mouseleave="clearPreview"
+                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                        >
+                            <img
+                                src="/static/elements/open-folder.svg"
+                                class="size-5 hidden group-hover:block"
+                                alt=""
+                            />
+                            <img
+                                src="/static/elements/closed-folder.svg"
+                                class="size-5 group-hover:hidden"
+                                alt=""
+                            />
+                            <div
+                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
+                            >
+                                <span class="text-lg">PERSONAL WORK</span>
+                                <span class="text-sm">STORYBOARD</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 3D Flip Card Preview -->
+                <div
+                    class="order-1 lg:order-2 flex justify-center items-center lg:sticky lg:top-32 h-fit"
+                >
+                    <div class="flip-card-container">
+                        <div
+                            class="flip-card"
+                            :class="{ 'is-flipped': isFlipped }"
+                        >
+                            <!-- Front Face (Default - Branding) -->
+                            <div class="flip-card-face flip-card-front">
+                                <div class="flip-card-content w-full h-full">
+                                    <img
+                                        src="/static/favicon/meta.png"
+                                        alt="Emily Yobal Branding"
+                                        class="w-full h-full object-cover rounded-2xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Back Face (Project Preview) -->
+                            <div class="flip-card-face flip-card-back">
+                                <div
+                                    class="flip-card-content w-full h-full rounded-2xl flex flex-col overflow-hidden"
+                                >
+                                    <!-- Project Image Preview -->
+                                    <div
+                                        class="flex-1 relative overflow-hidden"
+                                    >
+                                        <div
+                                            v-if="currentPreview === 'albumcovers'"
+                                            class="w-full h-full"
+                                        >
+                                            <img
+                                                src="/static/elements/albumcovers/1.png"
+                                                alt="ID Album Covers Preview"
+                                                class="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'namaste'"
+                                            class="w-full h-full bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center"
+                                        >
+                                            <img
+                                                src="/static/elements/namaste/1.png"
+                                                alt="ID Album Covers Preview"
+                                                class="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'aiapp'"
+                                            class="w-full h-full bg-gradient-to-br from-blue-900 to-cyan-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">🤖</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'clickbuddy'"
+                                            class="w-full h-full bg-gradient-to-br from-green-900 to-emerald-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">🖱️</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'necoloco'"
+                                            class="w-full h-full bg-gradient-to-br from-orange-900 to-red-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">🎨</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'twin'"
+                                            class="w-full h-full bg-gradient-to-br from-indigo-900 to-violet-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">👤</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'threed'"
+                                            class="w-full h-full bg-gradient-to-br from-slate-900 to-zinc-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">📦</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'corners'"
+                                            class="w-full h-full bg-gradient-to-br from-amber-900 to-yellow-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">🖼️</div>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'story'"
+                                            class="w-full h-full bg-gradient-to-br from-rose-900 to-pink-900 flex items-center justify-center"
+                                        >
+                                            <div class="text-6xl">🎬</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Project Info at Bottom -->
+                                    <div
+                                        class="bg-black/80 backdrop-blur-sm p-6"
+                                    >
+                                        <div
+                                            v-if="currentPreview === 'albumcovers'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                ID Album Covers
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Illustration
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'namaste'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Namaste Nonsense
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Illustration
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'aiapp'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                AI App
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Character Design
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'clickbuddy'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Clickbuddy
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Product & Brand Design
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'necoloco'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Necoloco
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                UI/UX
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'twin'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Digital Twin
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                3D Modelling
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'threed'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Personal Work
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                3D Modelling
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'corners'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                ID Corner Frames
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Illustration
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-else-if="currentPreview === 'story'"
+                                        >
+                                            <h3 class="text-xl font-bold mb-1">
+                                                Personal Work
+                                            </h3>
+                                            <p
+                                                class="text-sm text-neutral-400 uppercase tracking-wide"
+                                            >
+                                                Storyboard
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </section>
             <section
-                id="skills"
-                class="font-mono p-8 mt-64 text-justify sm:text-center flex justify-center items-center max-w-5xl text-lg md:text-xl xl:text-3xl mx-auto h-[50vh]"
+                id="about"
+                class="font-mono p-8 mt-64 text-justify sm:text-center flex justify-center items-center max-w-5xl text-lg md:text-4xl xl:text-5xl mx-auto h-[50vh]"
             >
                 <p id="skills-text" class="cursor-default">
                     UI/UX DESIGN, GRAPHIC DESIGN, ILLUSTRATION, CHARACTER
@@ -348,6 +583,7 @@
                 </p>
             </section>
             <section
+                id="contact"
                 class="font-mono p-8 text-center flex gap-10 flex-col justify-center items-center max-w-5xl text-3xl mx-auto h-[50vh]"
             >
                 <h2>YOU CAN FIND ME ON</h2>

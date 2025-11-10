@@ -6,6 +6,38 @@ const AlbumCovers = {
     template: "#albumcovers",
 };
 
+const Namaste = {
+    template: "#namaste",
+};
+
+const Aiapp = {
+    template: "#aiapp",
+};
+
+const Clickbuddy = {
+    template: "#clickbuddy",
+};
+
+const Necoloco = {
+    template: "#necoloco",
+};
+
+const Twin = {
+    template: "#twin",
+};
+
+const Threed = {
+    template: "#threed",
+};
+
+const Corners = {
+    template: "#corners",
+};
+
+const Story = {
+    template: "#story",
+};
+
 createApp({
     data() {
         return {
@@ -15,6 +47,20 @@ createApp({
             gradientTexture: null,
             fluidEffect: null,
             albumcovers: false,
+            namaste: false,
+            aiapp: false,
+            clickbuddy: false,
+            necoloco: false,
+            twin: false,
+            threed: false,
+            corners: false,
+            story: false,
+            currentPreview: null,
+            targetPreview: null,
+            isFlipped: false,
+            isAnimating: false,
+            animationQueue: [],
+            clearPreviewTimeout: null,
             renderScale:
                 typeof backgroundSettings !== "undefined"
                     ? backgroundSettings.renderScale
@@ -51,6 +97,7 @@ createApp({
     },
     components: {
         AlbumCovers,
+        Namaste,
     },
     delimiters: ["[[", "]]"],
 
@@ -58,8 +105,122 @@ createApp({
         openAlbumCovers() {
             this.albumcovers = true;
         },
-        closeAlbumCovers() {
-            this.albumcovers = false;
+        openNamaste() {
+            this.namaste = true;
+        },
+        openAiapp() {
+            this.aiapp = true;
+        },
+
+        previewProject(projectName) {
+            // Cancel any pending clear
+            if (this.clearPreviewTimeout) {
+                clearTimeout(this.clearPreviewTimeout);
+                this.clearPreviewTimeout = null;
+            }
+
+            // Update target and process queue
+            this.targetPreview = projectName;
+            this.processAnimationQueue();
+        },
+
+        clearPreview() {
+            // Cancel any existing timeout
+            if (this.clearPreviewTimeout) {
+                clearTimeout(this.clearPreviewTimeout);
+            }
+
+            // Delay clearing to handle gaps between list items
+            this.clearPreviewTimeout = setTimeout(() => {
+                this.targetPreview = null;
+                this.processAnimationQueue();
+                this.clearPreviewTimeout = null;
+            }, 150); // 150ms delay before clearing
+        },
+
+        processAnimationQueue() {
+            // If already animating, the current animation will check the queue when done
+            if (this.isAnimating) return;
+
+            // If we're already at the target, nothing to do
+            if (this.currentPreview === this.targetPreview) return;
+
+            const card = document.querySelector(".flip-card");
+            if (!card) return;
+
+            this.isAnimating = true;
+
+            const from = this.currentPreview;
+            const to = this.targetPreview;
+
+            // Case 1: From one preview to another preview (360° spin)
+            if (from !== null && to !== null) {
+                card.classList.remove(
+                    "flip-animation",
+                    "flip-back-animation",
+                    "spin-360-animation"
+                );
+                void card.offsetWidth;
+
+                card.classList.add("spin-360-animation");
+
+                // Update content at midpoint
+                setTimeout(() => {
+                    this.currentPreview = to;
+                }, 400);
+
+                setTimeout(() => {
+                    card.classList.remove("spin-360-animation");
+                    card.style.transform = "rotateY(180deg)";
+
+                    setTimeout(() => {
+                        card.style.transform = "";
+                        this.isAnimating = false;
+                        // Check if target changed during animation
+                        this.processAnimationQueue();
+                    }, 50);
+                }, 800);
+            }
+            // Case 2: From default to preview (flip forward)
+            else if (from === null && to !== null) {
+                card.classList.remove(
+                    "flip-animation",
+                    "flip-back-animation",
+                    "spin-360-animation"
+                );
+                void card.offsetWidth;
+
+                card.classList.add("flip-animation");
+                this.currentPreview = to;
+                this.isFlipped = true;
+
+                setTimeout(() => {
+                    card.classList.remove("flip-animation");
+                    this.isAnimating = false;
+                    // Check if target changed during animation
+                    this.processAnimationQueue();
+                }, 800);
+            }
+            // Case 3: From preview to default (flip back)
+            else if (from !== null && to === null) {
+                card.classList.remove(
+                    "flip-animation",
+                    "flip-back-animation",
+                    "spin-360-animation"
+                );
+                void card.offsetWidth;
+
+                card.classList.add("flip-back-animation");
+
+                // Don't clear content until animation completes
+                setTimeout(() => {
+                    card.classList.remove("flip-back-animation");
+                    this.isFlipped = false;
+                    this.currentPreview = null;
+                    this.isAnimating = false;
+                    this.processAnimationQueue();
+                }, 800);
+            }
         },
 
         initBackground() {
@@ -140,183 +301,120 @@ createApp({
                         return 130.0 * dot(m, g);
                     }
                     
-                    // Soft film grain for photographic quality
-                    float filmGrain(vec2 coord, float time) {
-                        float grain = fract(sin(dot(coord + time * 0.001, vec2(12.9898, 78.233))) * 43758.5453);
-                        return grain * 0.012 - 0.006;
+                    // Fractal Brownian Motion for more organic waves
+                    float fbm(vec2 p) {
+                        float value = 0.0;
+                        float amplitude = 0.5;
+                        float frequency = 1.0;
+                        
+                        for(int i = 0; i < 5; i++) {
+                            value += amplitude * snoise(p * frequency);
+                            frequency *= 2.0;
+                            amplitude *= 0.5;
+                        }
+                        return value;
                     }
-
-                    // Generates a soft, string-like wave using a Gaussian falloff
-                    float stringWave(vec2 uv, float baseY, float thickness, float amplitude, float frequency, float phase, float t) {
-                        float curve = sin((uv.x * frequency) + phase + t) * amplitude;
-                        float dist = abs(uv.y - (baseY + curve));
-                        float falloff = exp(-pow(dist / thickness, 2.0));
-                        return falloff;
+                    
+                    // Enhanced dithering for that grainy diffused look
+                    float dither(vec2 coord) {
+                        // Blue noise pattern
+                        float noise1 = fract(sin(dot(coord, vec2(12.9898, 78.233))) * 43758.5453);
+                        float noise2 = fract(sin(dot(coord, vec2(93.9898, 67.345))) * 23421.6312);
+                        return (noise1 + noise2) * 0.015 - 0.015;
                     }
                     
                     void main() {
                         vec2 uv = vUv;
                         vec2 resolution = uResolution;
                         
-                        // Center-based coordinates for radial effects
-                        vec2 center = uv - 0.5;
-                        float distFromCenter = length(center);
-                        
                         // Adjust UV for aspect ratio
                         vec2 aspectUv = uv;
                         float aspect = resolution.x / resolution.y;
                         aspectUv.x *= aspect;
                         
-                        // Very slow drift for subtle motion
-                        float time = uTime * 0.05;
+                        // Slow time for breathing effect
+                        float time = uTime * 0.08;
                         
-                        // Large-scale smooth noise for organic light diffusion
-                        float noise1 = snoise(aspectUv * 0.5 + vec2(time * 0.15, time * 0.1));
-                        float noise2 = snoise(aspectUv * 0.3 + vec2(-time * 0.1, time * 0.12));
-                        float noise3 = snoise(aspectUv * 0.7 + vec2(time * 0.08, -time * 0.09));
+                        // Create complex wave distortion using FBM
+                        vec2 distortion1 = vec2(
+                            fbm(aspectUv * 1.5 + vec2(time * 0.4, time * 0.3)),
+                            fbm(aspectUv * 1.5 + vec2(time * 0.3, -time * 0.4))
+                        );
                         
-                        // Combine noises for subtle, organic flow
-                        float flow = (noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2);
+                        vec2 distortion2 = vec2(
+                            fbm(aspectUv * 0.8 + distortion1 * 0.3 + time * 0.2),
+                            fbm(aspectUv * 0.8 + distortion1 * 0.3 - time * 0.15)
+                        );
                         
-                        // Create diffused, string-like gradient waves that weave around each other
-                        float weaveSpeed = time * 0.35;
-                        float basePhase = uv.x * 1.6;
-
-                        float base1 = 0.35 + sin(basePhase + weaveSpeed) * 0.11;
-                        float base2 = 0.6 + sin(basePhase + weaveSpeed + 2.4) * 0.11;
-
-                        base1 += sin(time * 0.2) * 0.01;
-                        base2 += sin(time * 0.24 + 1.2) * 0.01;
-
-                        float string1Progress = smoothstep(0.35, 1.0, uv.x);
-                        float string1CoreThickness = mix(0.012, 0.028, string1Progress);
-                        float string1CoreAmplitude = mix(0.048, 0.072, string1Progress);
-                        float string1HaloThickness = mix(0.07, 0.11, string1Progress);
-                        float string1HaloAmplitude = mix(0.076, 0.11, string1Progress);
-                        float string1Core = stringWave(uv, base1, string1CoreThickness, string1CoreAmplitude, 6.2, 0.0, time * 0.55);
-                        float string1Halo = stringWave(uv, base1, string1HaloThickness, string1HaloAmplitude, 6.2, 0.0, time * 0.55);
-
-                        float string2Progress = smoothstep(0.0, 0.55, uv.x);
-                        float string2CoreThickness = mix(0.26, 0.042, string2Progress);
-                        float string2CoreAmplitude = mix(0.228, 0.074, string2Progress);
-                        float string2HaloThickness = mix(0.55, 0.15, string2Progress);
-                        float string2HaloAmplitude = mix(0.39, 0.12, string2Progress);
-                        float string2Core = stringWave(uv, base2, string2CoreThickness, string2CoreAmplitude, 5.6, 2.2, time * 0.5);
-                        float string2Halo = stringWave(uv, base2, string2HaloThickness, string2HaloAmplitude, 5.6, 2.2, time * 0.5);
-
-                        // Gently modulate each wave so it fades in and out over time
-                        float stringPulse1 = smoothstep(0.0, 1.0, sin(time * 0.25 + 0.4) * 0.5 + 0.5);
-                        float stringPulse2 = smoothstep(0.0, 1.0, sin(time * 0.3 + 1.1) * 0.5 + 0.5);
-
-                        string1Core *= mix(0.42, 1.0, stringPulse1);
-                        string1Halo *= mix(0.5, 1.0, stringPulse1);
-                        string2Core *= mix(0.37, 1.0, stringPulse2);
-                        string2Halo *= mix(0.45, 1.0, stringPulse2);
-
-                        float string1 = mix(string1Halo, string1Core, 0.3);
-                        float string2 = mix(string2Halo, string2Core, 0.22);
-
-                        // Combine the waves, keeping them soft while allowing visible intertwining
-                        float horizontalWaves = string1 * 0.12 + string2 * 0.115;
-                        horizontalWaves = smoothstep(0.0, 0.12, horizontalWaves);
+                        // Apply layered distortion for wave diffusion
+                        vec2 finalUv = aspectUv + distortion1 * 0.12 + distortion2 * 0.08;
                         
-                        // Create soft, photographic gradient base
-                        // Diagonal gradient from top-right to bottom-left
-                        float gradientBase = (aspectUv.x * 0.4 + aspectUv.y * 0.6);
+                        // Create the main gradient flow
+                        float gradientFlow = finalUv.x * 0.6 + finalUv.y * 0.8;
                         
-                        // Add radial component for bokeh-like center focus
-                        float radialGrad = 1.0 - distFromCenter * 0.8;
+                        // Add wave motion
+                        float wave1 = fbm(finalUv * 2.0 + time * 0.3) * 0.15;
+                        float wave2 = fbm(finalUv * 1.2 - time * 0.2) * 0.1;
                         
-                        // Combine with subtle noise and horizontal waves
-                        float gradientFlow = gradientBase + flow * 0.1 + radialGrad * 0.16 + horizontalWaves * 0.35;
+                        gradientFlow += wave1 + wave2;
                         
-                        // Very subtle pointer interaction (light following cursor)
-                        vec2 pointerInfluence = (uv - uPointer);
+                        // Pointer interaction
+                        vec2 pointerInfluence = (uv - uPointer) * 1.5;
                         float pointerDist = length(pointerInfluence);
-                        float pointerGlow = smoothstep(0.8, 0.0, pointerDist) * uPointerDown * 0.08;
-                        gradientFlow += pointerGlow;
+                        float pointerEffect = smoothstep(0.8, 0.0, pointerDist) * uPointerDown * 0.12;
+                        gradientFlow += pointerEffect;
                         
-                        // Warm to cool color palette - photographic quality
-                        vec3 deepNavy = vec3(0.01, 0.015, 0.035);      // Deeper navy base
-                        vec3 darkIndigo = vec3(0.03, 0.045, 0.09);     // Dark indigo
-                        vec3 richPurple = vec3(0.06, 0.04, 0.12);      // Rich cool purple
-                        vec3 coolBlue = vec3(0.10, 0.12, 0.24);        // Cool blue
-                        vec3 duskBlue = vec3(0.14, 0.15, 0.30);        // Dusk blue
-                        vec3 mutedTeal = vec3(0.18, 0.22, 0.32);       // Muted teal
-                        vec3 softSlate = vec3(0.22, 0.26, 0.34);       // Soft slate
+                        // Color palette matching the reference image
+                        vec3 color1 = vec3(0.02, 0.05, 0.15);  // Deep dark blue
+                        vec3 color2 = vec3(0.15, 0.08, 0.28);  // Dark purple-blue
+                        vec3 color3 = vec3(0.45, 0.12, 0.18);  // Deep magenta-red
+                        vec3 color4 = vec3(0.85, 0.25, 0.15);  // Bright red-orange
+                        vec3 color5 = vec3(0.95, 0.55, 0.25);  // Light orange
+                        vec3 color6 = vec3(0.98, 0.75, 0.45);  // Pale orange/yellow
                         
-                        // Ultra-smooth gradient transitions
+                        // Smooth multi-step gradient
                         vec3 finalColor;
                         float t = gradientFlow;
                         
-                        // Create seamless blending between colors
-                        if (t < 0.15) {
-                            finalColor = mix(deepNavy, darkIndigo, smoothstep(0.0, 0.15, t));
-                        } else if (t < 0.35) {
-                            finalColor = mix(darkIndigo, richPurple, smoothstep(0.15, 0.35, t));
-                        } else if (t < 0.55) {
-                            finalColor = mix(richPurple, coolBlue, smoothstep(0.35, 0.55, t));
+                        if (t < 0.2) {
+                            finalColor = mix(color1, color2, smoothstep(0.0, 0.2, t));
+                        } else if (t < 0.4) {
+                            finalColor = mix(color2, color3, smoothstep(0.2, 0.4, t));
+                        } else if (t < 0.6) {
+                            finalColor = mix(color3, color4, smoothstep(0.4, 0.6, t));
                         } else if (t < 0.75) {
-                            finalColor = mix(coolBlue, duskBlue, smoothstep(0.55, 0.75, t));
+                            finalColor = mix(color4, color5, smoothstep(0.6, 0.75, t));
                         } else if (t < 0.9) {
-                            finalColor = mix(duskBlue, mutedTeal, smoothstep(0.75, 0.9, t));
+                            finalColor = mix(color5, color6, smoothstep(0.75, 0.9, t));
                         } else {
-                            finalColor = mix(mutedTeal, softSlate, smoothstep(0.9, 1.05, t));
+                            finalColor = mix(color6, color5, smoothstep(0.9, 1.1, t));
                         }
                         
-                        // Add extremely subtle color variation for depth
-                        vec3 colorShift = vec3(
-                            snoise(aspectUv * 1.2 + time * 0.05),
-                            snoise(aspectUv * 1.2 + time * 0.05 + 100.0),
-                            snoise(aspectUv * 1.2 + time * 0.05 + 200.0)
-                        ) * 0.012;
+                        // Add subtle color variations based on noise
+                        vec3 colorNoise = vec3(
+                            snoise(finalUv * 3.0 + time * 0.1),
+                            snoise(finalUv * 3.0 + time * 0.1 + 100.0),
+                            snoise(finalUv * 3.0 + time * 0.1 + 200.0)
+                        ) * 0.03;
                         
-                        finalColor += colorShift;
+                        finalColor += colorNoise;
                         
-                        // Very subtle brightness variation for light diffusion
-                        float lightDiffusion = 1.0 + (noise1 * 0.04 + noise2 * 0.03);
-                        finalColor *= lightDiffusion;
+                        // Add brightness variation for depth
+                        float brightness = 1.0 + snoise(finalUv * 2.5 + time * 0.15) * 0.08;
+                        finalColor *= brightness;
                         
-                        // Bokeh-style soft highlights in warm areas
-                        float bokehHighlight = smoothstep(0.6, 0.9, t) * 0.08;
-                        finalColor += bokehHighlight * 0.6;
-
-                        // Subtle warm glow along the diffused string waves
-                        vec3 stringColor1 = vec3(0.96, 0.55, 0.16);  // warm orange
-                        vec3 stringColor2 = vec3(1.0, 0.12, 0.04);   // vivid red-orange
-
-                        float string1ColorStrength = string1Core * 0.78 + string1Halo * 0.42;
-                        float string2ColorStrength = string2Core * 0.88 + string2Halo * 0.48;
-
-                        vec3 stringLight =
-                            string1Core * stringColor1 * 0.16 +
-                            string1Halo * stringColor1 * 0.1 +
-                            string2Core * stringColor2 * 0.18 +
-                            string2Halo * stringColor2 * 0.1;
-
-                        float stringSum = string1ColorStrength + string2ColorStrength + 1e-5;
-                        vec3 blendedStringColor =
-                            (string1ColorStrength * stringColor1 +
-                             string2ColorStrength * stringColor2) / stringSum;
-
-                        float stringMixStrength = clamp(stringSum * 0.65, 0.0, 1.0);
-                        finalColor = mix(finalColor, blendedStringColor, min(0.6, stringMixStrength));
-                        finalColor += stringLight;
-                        
-                        // Photographic film grain
-                        float grain = filmGrain(gl_FragCoord.xy, uTime);
+                        // Apply grain/dither texture for diffused look
+                        float grain = dither(gl_FragCoord.xy);
                         finalColor += grain;
                         
-                        // Soft vignette for lens-like focus
-                        float vignette = 1.0 - pow(distFromCenter * 1.2, 1.8);
-                        vignette = smoothstep(0.0, 1.0, vignette);
+                        // Slight vignette for depth
+                        float vignette = 1.0 - length(uv - 0.5) * 0.3;
                         finalColor *= vignette;
                         
-                        // Very subtle edge darkening for photographic quality
-                        float edgeDarken = 1.0 - pow(distFromCenter, 3.2) * 0.3;
-                        finalColor *= edgeDarken;
+                        // Ensure colors stay in valid range
+                        finalColor = clamp(finalColor, 0.0, 1.0);
                         
-                        gl_FragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);
+                        gl_FragColor = vec4(finalColor, 1.0);
                     }
                 `,
             });
@@ -416,94 +514,141 @@ createApp({
 
         animateTitle() {
             const title = document.getElementById("hero-title");
+            if (!title) {
+                return;
+            }
+
             const finalText = "Emily Yobal";
-            const chars =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:',.<>?/`~0123456789";
 
-            title.innerHTML = finalText
-                .split("")
-                .map((char) => {
-                    if (char === " ") {
-                        return '<span class="char">&nbsp;</span>';
-                    }
-                    const randomChar =
-                        chars[Math.floor(Math.random() * chars.length)];
-                    return `<span class="char">${randomChar}</span>`;
-                })
-                .join("");
+            title.innerHTML = "";
+            title.style.display = "inline-block";
+            title.style.position = "relative";
+            title.style.whiteSpace = "nowrap";
 
-            const charElements = title.querySelectorAll(".char");
-            const tl = gsap.timeline({ delay: 0.5 });
+            const fragment = document.createDocumentFragment();
 
-            gsap.set(charElements, {
-                opacity: 0.5,
-                scale: 0.8,
-                color: "#888",
+            finalText.split("").forEach((char, index) => {
+                const span = document.createElement("span");
+                span.className = "char";
+                span.textContent = char === " " ? "\u00a0" : char;
+                span.style.display = "inline-block";
+                span.style.padding = "0 0.04em";
+                span.style.minWidth = char === " " ? "0.4em" : "auto";
+                span.style.transformOrigin = "50% 100%";
+                fragment.appendChild(span);
             });
 
-            charElements.forEach((charEl, i) => {
-                if (finalText[i] === " ") return;
+            title.appendChild(fragment);
 
-                const delay = i * 0.06;
-                const iterations = 10;
+            const caret = document.createElement("span");
+            caret.className = "typing-caret";
+            title.appendChild(caret);
 
-                for (let j = 0; j < iterations; j++) {
-                    tl.call(
-                        () => {
-                            charEl.textContent =
-                                chars[Math.floor(Math.random() * chars.length)];
-                        },
-                        null,
-                        delay + j * 0.035
-                    );
-                }
+            const charElements = Array.from(title.querySelectorAll(".char"));
+            const caretHeight =
+                (parseFloat(window.getComputedStyle(title).fontSize) || 24) *
+                1.05;
 
-                tl.call(
-                    () => {
-                        charEl.textContent = finalText[i];
+            Object.assign(caret.style, {
+                position: "absolute",
+                top: "50%",
+                left: "0",
+                transform: "translate(-50%, -50%)",
+                width: "2px",
+                height: `${caretHeight}px`,
+                borderRadius: "999px",
+                background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.35))",
+                boxShadow: "0 0 10px rgba(255, 255, 255, 0.45)",
+                opacity: "0",
+            });
+
+            gsap.set(charElements, {
+                opacity: 0,
+                yPercent: 60,
+                scale: 0.92,
+                filter: "blur(10px)",
+                color: "#8f8f91",
+            });
+
+            const positions = charElements.map((el) => ({
+                start: el.offsetLeft,
+                end: el.offsetLeft + el.offsetWidth,
+            }));
+
+            const tl = gsap.timeline({ delay: 0.4 });
+
+            if (positions.length) {
+                gsap.set(caret, { x: positions[0].start });
+            }
+
+            tl.to(caret, {
+                opacity: 1,
+                duration: 0.18,
+                ease: "power2.out",
+            });
+
+            const letterDelay = 0.09;
+
+            charElements.forEach((charEl, index) => {
+                const startTime = index * letterDelay;
+                const { start, end } = positions[index];
+
+                tl.to(
+                    caret,
+                    {
+                        x: start,
+                        duration: 0.09,
+                        ease: "power3.out",
                     },
-                    null,
-                    delay + iterations * 0.035
+                    startTime
                 );
 
                 tl.to(
                     charEl,
                     {
                         opacity: 1,
-                        scale: 1.05,
+                        yPercent: 0,
+                        scale: 1,
+                        filter: "blur(0px)",
                         color: "#ffffff",
-                        duration: 0.15,
-                        ease: "back.out(3)",
+                        textShadow: "0 0 22px rgba(255, 255, 255, 0.35)",
+                        duration: 0.38,
+                        ease: "power3.out",
                     },
-                    delay + iterations * 0.035
+                    startTime + 0.03
+                );
+
+                tl.to(
+                    caret,
+                    {
+                        x: end,
+                        duration: 0.08,
+                        ease: "power1.out",
+                    },
+                    startTime + 0.16
                 );
 
                 tl.to(
                     charEl,
                     {
-                        scale: 1,
-                        duration: 0.6,
-                        ease: "elastic.out(1, 0.5)",
+                        textShadow: "0 0 0 rgba(0,0,0,0)",
+                        duration: 0.5,
+                        ease: "sine.inOut",
                     },
-                    delay + iterations * 0.035 + 0.15
+                    startTime + 0.52
                 );
             });
 
-            tl.to(
-                title,
-                {
-                    textShadow: "0 0 20px rgba(255,255,255,0.5)",
-                    duration: 0.3,
-                    ease: "power2.in",
-                },
-                "+=0.2"
-            ).to(title, {
-                textShadow: "0 0 0px rgba(255,255,255,0)",
-                duration: 0.4,
-                ease: "power2.out",
+            tl.call(() => {
+                gsap.to(caret, {
+                    opacity: 0.2,
+                    duration: 0.7,
+                    ease: "sine.inOut",
+                    repeat: -1,
+                    yoyo: true,
+                });
             });
-
-            tl.to({}, { duration: 0.8 });
         },
     },
 
