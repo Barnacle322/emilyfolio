@@ -21,29 +21,29 @@ def index():
 
 @main.errorhandler(400)
 def bad_request(e):
-    return render_template("errors/400.html"), 400
+    return redirect(url_for("main.index"))
 
 
 @main.errorhandler(401)
 def unauthorized(e):
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("main.index"))
 
 
 @main.errorhandler(403)
 def forbidden(e):
-    return render_template("errors/403.html"), 403
+    return redirect(url_for("main.index"))
 
 
 @main.errorhandler(404)
 def page_not_found(e):
-    return render_template("errors/404.html"), 404
+    return redirect(url_for("main.index"))
 
 
 @main.errorhandler(500)
 def internal_server_error(e):
-    return render_template("errors/500.html"), 500
+    return redirect(url_for("main.index"))
 
 
 @main.errorhandler(503)
 def service_unavailable(e):
-    return render_template("errors/503.html"), 503
+    return redirect(url_for("main.index"))

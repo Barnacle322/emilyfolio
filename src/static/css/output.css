@@ -781,28 +781,14 @@
   src: url("../fonts/Jost-VariableFont_wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 @font-face {
   font-family: "Unbounded";
   src: url("../fonts/Unbounded.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
-  font-display: optional;
-}
-@font-face {
-  font-family: "Jost";
-  src: url("../fonts/Jost-Italic-VariableFont_wght.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: optional;
-}
-@font-face {
-  font-family: "Press Start 2P";
-  src: url("../fonts/PressStart2P-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 html {
   scroll-behavior: smooth;
@@ -879,7 +865,7 @@ html {
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient( to right bottom, gray, darkgray );
+  background: linear-gradient(to right bottom, gray, darkgray);
   border-radius: 18px;
   padding: 4px;
 }
