@@ -338,10 +338,22 @@
   .grow {
     flex-grow: 1;
   }
+  .scale-70 {
+    --tw-scale-x: 70%;
+    --tw-scale-y: 70%;
+    --tw-scale-z: 70%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
   .scale-80 {
     --tw-scale-x: 80%;
     --tw-scale-y: 80%;
     --tw-scale-z: 80%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+  .scale-90 {
+    --tw-scale-x: 90%;
+    --tw-scale-y: 90%;
+    --tw-scale-z: 90%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
   }
   .transform {
@@ -424,6 +436,9 @@
   }
   .rounded-3xl {
     border-radius: var(--radius-3xl);
+  }
+  .bg-\[\#151515\] {
+    background-color: #151515;
   }
   .bg-\[\#12121200\] {
     background-color: #12121200;
