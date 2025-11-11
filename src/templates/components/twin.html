@@ -1,7 +1,7 @@
 {% macro render() %}
 <template id="twin">
     <section
-        class="z-50 fixed inset-0 bg-black text-white flex flex-col md:flex-row overflow-y-auto md:overflow-y-hidden md:overflow-x-auto items-center p-10 gap-10 scroll-smooth scrollbar-none md:touch-pan-x md:overscroll-x-contain"
+        class="z-50 fixed overscroll-contain inset-0 bg-black text-white flex flex-col md:flex-row overflow-y-auto md:overflow-y-hidden md:overflow-x-auto items-center p-8 gap-10 scroll-smooth scrollbar-none md:touch-pan-x"
     >
         <!-- Close Button -->
         <button
@@ -15,53 +15,74 @@
         <article
             class="shrink-0 max-w-lg flex flex-col gap-10 justify-center py-10 sm:px-10 md:py-0"
         >
-            <h1 class="font-mono text-3xl">NAMASTER NONSENSE</h1>
+            <h1 class="font-mono text-3xl">DIGITAL TWIN</h1>
             <p>
-                I co-founded Namaste Nonsense, a D2C card game designed for the
-                Indian audience that turns every gathering into laughter and
-                chaos. As the lead designer, I created the visual identity,
-                illustrations, and card layouts, capturing the humor and
-                vibrance of Indian culture. The goal was to design an experience
-                that feels playful, bold, and instantly recognizable.
-                <br /><br />
-                A project that combined design, storytelling, and business, all
-                built to connect people through creativity and fun.
+                I worked on the development of high-precision Digital Twin
+                models designed to create realistic 3D representations of
+                individuals for long-term health tracking and personalized
+                guidance.
+                <br />
+                My role focused on transforming real photographs into detailed,
+                lifelike 3D models, ensuring anatomical accuracy, texture
+                fidelity, and a natural appearance.
+                <br />
+                Each model was crafted to reflect unique human features while
+                maintaining technical precision for data visualization and
+                integration purposes.
+                <br />
+                This project was created under Immortal Dragons, the project
+                aimed to combine approachability with scientific purposes.
             </p>
             <p>
                 <b class="font-medium">TYPE:</b> COMMERCIAL WORK<br />
-                <b class="font-medium">JOB:</b> ILLUSTRATION, GRAPHIC DESIGN<br />
-                <b class="font-medium">TOOLS:</b> ILLUSTRATOR<br />
+                <b class="font-medium">JOB:</b> GRAPHIC DESIGN<br />
+                <b class="font-medium">TOOLS:</b> CC4, BLENDER, PHOTOSHOP<br />
                 <b class="font-medium">YEAR:</b> 2025
             </p>
         </article>
 
         <!-- IMAGES -->
         <img
-            src="/static/elements/namaste/1.png"
+            src="/static/elements/twin/1.jpg"
             alt=""
-            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5"
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
         />
         <img
-            src="/static/elements/namaste/2.png"
+            src="/static/elements/twin/2.jpg"
             alt=""
-            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5"
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
         />
-        <div
-            class="shrink-0 w-full aspect-square md:w-auto md:h-[32rem] lg:h-4/5 grid grid-cols-2 gap-4 grid-rows-2"
-        >
-            <img src="/static/elements/namaste/3.png" alt="" />
-            <img src="/static/elements/namaste/6.png" alt="" />
-            <img src="/static/elements/namaste/5.png" alt="" />
-            <img src="/static/elements/namaste/4.png" alt="" />
-        </div>
         <img
-            src="/static/elements/namaste/7.png"
+            src="/static/elements/twin/3.jpg"
             alt=""
-            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5"
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
         />
+        <img
+            src="/static/elements/twin/4.jpg"
+            alt=""
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
+        />
+        <img
+            src="/static/elements/twin/5.jpg"
+            alt=""
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
+        />
+
+        <img
+            src="/static/elements/twin/6.jpg"
+            alt=""
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-2xl sm:rounded-[40px]"
+        />
+        <video
+            autoplay
+            loop
+            src="/static/elements/twin/7.mp4"
+            alt=""
+            class="shrink-0 w-full md:w-auto md:h-[32rem] lg:h-4/5 rounded-3xl sm:rounded-[40px]"
+        ></video>
         <button
             @click="$emit('close')"
-            class="font-mono sm:-rotate-90 text-4xl cursor-pointer hover:tracking-widest tracking-normal transition-all ease-in-out"
+            class="font-mono md:-rotate-90 text-4xl cursor-pointer hover:tracking-widest tracking-normal transition-all ease-in-out"
         >
             CLOSE
         </button>

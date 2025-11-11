@@ -5,28 +5,28 @@
     src: url("../fonts/Jost-VariableFont_wght.ttf") format("truetype");
     font-weight: 100 900;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 @font-face {
     font-family: "Unbounded";
     src: url("../fonts/Unbounded.ttf") format("truetype");
     font-weight: 100 900;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 @font-face {
     font-family: "Jost";
     src: url("../fonts/Jost-Italic-VariableFont_wght.ttf") format("truetype");
     font-weight: 100 900;
     font-style: italic;
-    font-display: swap;
+    font-display: optional;
 }
 @font-face {
     font-family: "Press Start 2P";
     src: url("../fonts/PressStart2P-Regular.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 html {
@@ -97,6 +97,21 @@ html {
 }
 
 /* 3D Flip Card Styles */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+.float {
+    animation: float 4s ease-in-out infinite;
+}
+
 .flip-card-container {
     perspective: 1000px;
     width: 350px;
@@ -111,10 +126,8 @@ html {
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(
         to right bottom,
-        #f2c59d 0%,
-        #e88b4a 25%,
-        #c54b2b 55%,
-        #2e1c20 100%
+        gray,
+        darkgray
     );
     border-radius: 18px;
     padding: 4px;
@@ -194,59 +207,46 @@ html {
     background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
 }
 
-/* Content transitions */
+/* Content transitions - Simple and symmetric */
 .flip-card-content {
     opacity: 1;
+    transition: opacity 0.3s ease-in-out;
 }
 
-/* Front face content - fade out immediately when flipping */
+/* Case 2: Forward flip (default → project) */
+/* Front face fades out immediately */
 .flip-card.flip-animation .flip-card-front .flip-card-content {
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
 
-/* Back face content - fade in after flip starts */
+/* Back face fades in after flip starts */
 .flip-card.flip-animation .flip-card-back .flip-card-content {
     opacity: 0;
-    transition: opacity 0.3s ease-in-out 0.4s; /* Start fading in at 400ms */
+    transition: opacity 0.3s ease-in-out 0.4s;
 }
 
+/* Static flipped state */
 .flip-card.is-flipped .flip-card-back .flip-card-content {
     opacity: 1;
 }
 
-/* CRITICAL: Fade back content out smoothly during flip-back */
+/* Case 3: Backward flip (project → default) - Mirror of Case 2 */
+/* Back face fades out immediately */
 .flip-card.flip-back-animation .flip-card-back .flip-card-content {
-    animation: fadeOutDuringFlip 0.8s ease-in-out forwards;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
 
-@keyframes fadeOutDuringFlip {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Front face content stays hidden then fades in during flip-back */
+/* Front face fades in after flip starts */
 .flip-card.flip-back-animation .flip-card-front .flip-card-content {
-    animation: fadeInDuringFlip 0.8s ease-in-out forwards;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out 0.4s;
 }
 
-@keyframes fadeInDuringFlip {
-    0% {
-        opacity: 0;
-    }
-    60% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+/* Static default state */
+.flip-card:not(.is-flipped) .flip-card-front .flip-card-content {
+    opacity: 1;
 }
 
 /* After flip-back completes */

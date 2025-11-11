@@ -71,8 +71,22 @@
     {{ albumcovers.render() }}
     {% import "components/namaste.html" as namaste %}
     {{ namaste.render() }}
+    {% import "components/clickbuddy.html" as clickbuddy %}
+    {{ clickbuddy.render() }}
+    {% import "components/bob.html" as bob %}
+    {{ bob.render() }}
+    {% import "components/twin.html" as twin %}
+    {{ twin.render() }}
+    {% import "components/necoloco.html" as necoloco %}
+    {{ necoloco.render() }}
+    {% import "components/threed.html" as threed %}
+    {{ threed.render() }}
+    {% import "components/corners.html" as corners %}
+    {{ corners.render() }}
+    {% import "components/story.html" as story %}
+    {{ story.render() }}
     <body
-        class="bg-black scroll-smooth text-white font-display flex justify-center items-center min-h-screen relative overflow-x-hidden"
+        class="bg-black scroll-smooth text-white font-display flex justify-center items-center min-h-[100dvh] relative overflow-x-hidden"
         id="app"
     >
         <header
@@ -80,11 +94,11 @@
         >
             <nav
                 style="animation-delay: 2000ms"
-                class="move-down flex justify-between items-center max-w-3xl gap-16 text-lg uppercase tracking-wide"
+                class="move-down flex justify-between items-center max-w-3xl gap-8 sm:gap-16 text-lg uppercase tracking-wide"
             >
                 <a href="#projects">Projects</a>
-                <a href="#about">About Me</a>
-                <a href="#contact">Contact Me</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
             </nav>
         </header>
 
@@ -98,6 +112,30 @@
         <!-- Album covers with slide transition -->
         <transition name="slide">
             <namaste @close="namaste = false" v-if="namaste"></namaste>
+        </transition>
+        <transition name="slide">
+            <clickbuddy
+                @close="clickbuddy = false"
+                v-if="clickbuddy"
+            ></clickbuddy>
+        </transition>
+        <transition name="slide">
+            <bob @close="bob = false" v-if="bob"></bob>
+        </transition>
+        <transition name="slide">
+            <twin @close="twin = false" v-if="twin"></twin>
+        </transition>
+        <transition name="slide">
+            <necoloco @close="necoloco = false" v-if="necoloco"></necoloco>
+        </transition>
+        <transition name="slide">
+            <threed @close="threed = false" v-if="threed"></threed>
+        </transition>
+        <transition name="slide">
+            <corners @close="corners = false" v-if="corners"></corners>
+        </transition>
+        <transition name="slide">
+            <story @close="story = false" v-if="story"></story>
         </transition>
 
         <main class="relative z-10">
@@ -121,7 +159,7 @@
                 </h2>
             </section>
             <section
-                class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto px-8 mt-48 scroll-mt-48 font-medium"
+                class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto px-8 mt-12 sm:mt-56 sm:scroll-mt-56 scroll-mt-12 font-medium"
                 id="projects"
             >
                 <div class="order-2 lg:order-1">
@@ -173,7 +211,8 @@
                             </div>
                         </li>
                         <li
-                            @mouseenter="previewProject('aiapp')"
+                            @click="openBob"
+                            @mouseenter="previewProject('bob')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
                         >
@@ -190,11 +229,12 @@
                             <div
                                 class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                             >
-                                <span class="text-lg">AI APP</span>
+                                <span class="text-lg">BOB THE BLOB</span>
                                 <span class="text-sm">CHARACTER DESIGN</span>
                             </div>
                         </li>
                         <li
+                            @click="openClickbuddy"
                             @mouseenter="previewProject('clickbuddy')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -219,6 +259,7 @@
                             </div>
                         </li>
                         <li
+                            @click="openNecoloco"
                             @mouseenter="previewProject('necoloco')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -241,6 +282,7 @@
                             </div>
                         </li>
                         <li
+                            @click="openTwin"
                             @mouseenter="previewProject('twin')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -263,6 +305,7 @@
                             </div>
                         </li>
                         <li
+                            @click="openThreed"
                             @mouseenter="previewProject('threed')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -285,6 +328,7 @@
                             </div>
                         </li>
                         <li
+                            @click="openCorners"
                             @mouseenter="previewProject('corners')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -307,6 +351,7 @@
                             </div>
                         </li>
                         <li
+                            @click="openStory"
                             @mouseenter="previewProject('story')"
                             @mouseleave="clearPreview"
                             class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -334,7 +379,7 @@
                 <div
                     class="order-1 lg:order-2 flex justify-center items-center lg:sticky lg:top-32 h-fit"
                 >
-                    <div class="flip-card-container">
+                    <div class="flip-card-container float">
                         <div
                             class="flip-card"
                             :class="{ 'is-flipped': isFlipped }"
@@ -371,55 +416,87 @@
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'namaste'"
-                                            class="w-full h-full bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
                                             <img
                                                 src="/static/elements/namaste/1.png"
-                                                alt="ID Album Covers Preview"
+                                                alt="Namaste Nonsense Preview"
                                                 class="w-full h-full object-cover"
                                             />
                                         </div>
                                         <div
-                                            v-else-if="currentPreview === 'aiapp'"
-                                            class="w-full h-full bg-gradient-to-br from-blue-900 to-cyan-900 flex items-center justify-center"
+                                            v-else-if="currentPreview === 'bob'"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">🤖</div>
+                                            <video
+                                                src="/static/elements/bob/6.webm"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                                autoplay
+                                                loop
+                                            ></video>
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'clickbuddy'"
-                                            class="w-full h-full bg-gradient-to-br from-green-900 to-emerald-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">🖱️</div>
+                                            <img
+                                                src="/static/elements/clickbuddy/11.jpg"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'necoloco'"
-                                            class="w-full h-full bg-gradient-to-br from-orange-900 to-red-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">🎨</div>
+                                            <img
+                                                src="/static/elements/necoloco/preview.png"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'twin'"
-                                            class="w-full h-full bg-gradient-to-br from-indigo-900 to-violet-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">👤</div>
+                                            <img
+                                                src="/static/elements/twin/1.jpg"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'threed'"
-                                            class="w-full h-full bg-gradient-to-br from-slate-900 to-zinc-900 flex items-center justify-center"
+                                            class="w-full h-full bg-black"
                                         >
-                                            <div class="text-6xl">📦</div>
+                                            <video
+                                                src="/static/elements/threed/1.mp4"
+                                                alt="3D Preview"
+                                                class="w-full h-full object-cover scale-80"
+                                                autoplay
+                                                loop
+                                            ></video>
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'corners'"
-                                            class="w-full h-full bg-gradient-to-br from-amber-900 to-yellow-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">🖼️</div>
+                                            <img
+                                                src="/static/elements/corners/1.png"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                         <div
                                             v-else-if="currentPreview === 'story'"
-                                            class="w-full h-full bg-gradient-to-br from-rose-900 to-pink-900 flex items-center justify-center"
+                                            class="w-full h-full"
                                         >
-                                            <div class="text-6xl">🎬</div>
+                                            <img
+                                                src="/static/elements/story/1.png"
+                                                alt="Bob Preview"
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                     </div>
 
@@ -452,10 +529,10 @@
                                             </p>
                                         </div>
                                         <div
-                                            v-else-if="currentPreview === 'aiapp'"
+                                            v-else-if="currentPreview === 'bob'"
                                         >
                                             <h3 class="text-xl font-bold mb-1">
-                                                AI App
+                                                BOB THE BLOB
                                             </h3>
                                             <p
                                                 class="text-sm text-neutral-400 uppercase tracking-wide"

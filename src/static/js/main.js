@@ -10,8 +10,8 @@ const Namaste = {
     template: "#namaste",
 };
 
-const Aiapp = {
-    template: "#aiapp",
+const Bob = {
+    template: "#bob",
 };
 
 const Clickbuddy = {
@@ -48,7 +48,7 @@ createApp({
             fluidEffect: null,
             albumcovers: false,
             namaste: false,
-            aiapp: false,
+            bob: false,
             clickbuddy: false,
             necoloco: false,
             twin: false,
@@ -98,6 +98,13 @@ createApp({
     components: {
         AlbumCovers,
         Namaste,
+        Bob,
+        Clickbuddy,
+        Necoloco,
+        Twin,
+        Threed,
+        Corners,
+        Story,
     },
     delimiters: ["[[", "]]"],
 
@@ -108,10 +115,27 @@ createApp({
         openNamaste() {
             this.namaste = true;
         },
-        openAiapp() {
-            this.aiapp = true;
+        openBob() {
+            this.bob = true;
         },
-
+        openClickbuddy() {
+            this.clickbuddy = true;
+        },
+        openNecoloco() {
+            this.necoloco = true;
+        },
+        openTwin() {
+            this.twin = true;
+        },
+        openThreed() {
+            this.threed = true;
+        },
+        openCorners() {
+            this.corners = true;
+        },
+        openStory() {
+            this.story = true;
+        },
         previewProject(projectName) {
             // Cancel any pending clear
             if (this.clearPreviewTimeout) {
@@ -211,12 +235,11 @@ createApp({
                 void card.offsetWidth;
 
                 card.classList.add("flip-back-animation");
+                this.isFlipped = false; // Set immediately, just like Case 2
 
-                // Don't clear content until animation completes
                 setTimeout(() => {
                     card.classList.remove("flip-back-animation");
-                    this.isFlipped = false;
-                    this.currentPreview = null;
+                    this.currentPreview = null; // Clear content after animation
                     this.isAnimating = false;
                     this.processAnimationQueue();
                 }, 800);
