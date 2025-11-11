@@ -387,13 +387,13 @@ createApp({
                         float pointerEffect = smoothstep(0.8, 0.0, pointerDist) * uPointerDown * 0.12;
                         gradientFlow += pointerEffect;
                         
-                        // Color palette matching the reference image
-                        vec3 color1 = vec3(0.02, 0.05, 0.15);  // Deep dark blue
-                        vec3 color2 = vec3(0.15, 0.08, 0.28);  // Dark purple-blue
-                        vec3 color3 = vec3(0.45, 0.12, 0.18);  // Deep magenta-red
-                        vec3 color4 = vec3(0.85, 0.25, 0.15);  // Bright red-orange
-                        vec3 color5 = vec3(0.95, 0.55, 0.25);  // Light orange
-                        vec3 color6 = vec3(0.98, 0.75, 0.45);  // Pale orange/yellow
+                        // Ocean abyss palette with turquoise and cyan
+                        vec3 color1 = vec3(0.01, 0.08, 0.12);  // Deep teal-black
+                        vec3 color2 = vec3(0.03, 0.18, 0.25);  // Dark turquoise-blue
+                        vec3 color3 = vec3(0.08, 0.32, 0.42);  // Deep teal
+                        vec3 color4 = vec3(0.15, 0.48, 0.58);  // Ocean turquoise
+                        vec3 color5 = vec3(0.28, 0.68, 0.75);  // Bright turquoise
+                        vec3 color6 = vec3(0.45, 0.85, 0.88);  // Light cyan
                         
                         // Smooth multi-step gradient
                         vec3 finalColor;
@@ -563,28 +563,7 @@ createApp({
 
             title.appendChild(fragment);
 
-            const caret = document.createElement("span");
-            caret.className = "typing-caret";
-            title.appendChild(caret);
-
             const charElements = Array.from(title.querySelectorAll(".char"));
-            const caretHeight =
-                (parseFloat(window.getComputedStyle(title).fontSize) || 24) *
-                1.05;
-
-            Object.assign(caret.style, {
-                position: "absolute",
-                top: "50%",
-                left: "0",
-                transform: "translate(-50%, -50%)",
-                width: "2px",
-                height: `${caretHeight}px`,
-                borderRadius: "999px",
-                background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.35))",
-                boxShadow: "0 0 10px rgba(255, 255, 255, 0.45)",
-                opacity: "0",
-            });
 
             gsap.set(charElements, {
                 opacity: 0,
@@ -594,38 +573,12 @@ createApp({
                 color: "#8f8f91",
             });
 
-            const positions = charElements.map((el) => ({
-                start: el.offsetLeft,
-                end: el.offsetLeft + el.offsetWidth,
-            }));
-
             const tl = gsap.timeline({ delay: 0.4 });
-
-            if (positions.length) {
-                gsap.set(caret, { x: positions[0].start });
-            }
-
-            tl.to(caret, {
-                opacity: 1,
-                duration: 0.18,
-                ease: "power2.out",
-            });
 
             const letterDelay = 0.09;
 
             charElements.forEach((charEl, index) => {
                 const startTime = index * letterDelay;
-                const { start, end } = positions[index];
-
-                tl.to(
-                    caret,
-                    {
-                        x: start,
-                        duration: 0.09,
-                        ease: "power3.out",
-                    },
-                    startTime
-                );
 
                 tl.to(
                     charEl,
@@ -639,17 +592,7 @@ createApp({
                         duration: 0.38,
                         ease: "power3.out",
                     },
-                    startTime + 0.03
-                );
-
-                tl.to(
-                    caret,
-                    {
-                        x: end,
-                        duration: 0.08,
-                        ease: "power1.out",
-                    },
-                    startTime + 0.16
+                    startTime
                 );
 
                 tl.to(
@@ -659,18 +602,8 @@ createApp({
                         duration: 0.5,
                         ease: "sine.inOut",
                     },
-                    startTime + 0.52
+                    startTime + 0.38
                 );
-            });
-
-            tl.call(() => {
-                gsap.to(caret, {
-                    opacity: 0.2,
-                    duration: 0.7,
-                    ease: "sine.inOut",
-                    repeat: -1,
-                    yoyo: true,
-                });
             });
         },
     },

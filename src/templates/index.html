@@ -141,7 +141,7 @@
         >
             <nav
                 style="animation-delay: 2000ms"
-                class="move-down flex justify-between items-center max-w-3xl gap-8 sm:gap-16 text-lg uppercase tracking-wide"
+                class="move-down flex justify-between items-center max-w-3xl gap-4 sm:gap-8 lg:gap-16 text-base sm:text-lg uppercase tracking-wide"
             >
                 <a href="#projects">Projects</a>
                 <a href="#about">About</a>
@@ -195,11 +195,11 @@
                 ></canvas>
 
                 <h1
-                    class="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-mono font-bold capitalize"
+                    class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-mono font-bold capitalize px-4"
                     id="hero-title"
                 ></h1>
                 <h2
-                    class="text-center font-medium move-up"
+                    class="text-center font-medium move-up text-sm sm:text-base px-4"
                     style="animation-delay: 1500ms"
                 >
                     MULTIDISCIPLINARY DESIGNER. INNOVATIVE. 3D MODELLER.
@@ -209,219 +209,216 @@
                 class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto px-8 mt-12 sm:mt-56 sm:scroll-mt-56 scroll-mt-12 font-medium"
                 id="projects"
             >
-                <div class="order-2 lg:order-1">
-                    <ul class="flex flex-col gap-2">
-                        <li
-                            @click="openAlbumCovers"
-                            @mouseenter="previewProject('albumcovers')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                <ul class="flex flex-col gap-2 order-2 lg:order-1">
+                    <li
+                        @click="openAlbumCovers"
+                        @mouseenter="previewProject('albumcovers')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">ID ALBUM COVERS</span>
-                                <span class="text-sm">ILLUSTRATION</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openNamaste"
-                            @mouseenter="previewProject('namaste')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">ID ALBUM COVERS</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openNamaste"
+                        @mouseenter="previewProject('namaste')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">NAMASTE NONSENSE</span>
-                                <span class="text-sm">ILLUSTRATION</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openBob"
-                            @mouseenter="previewProject('bob')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">NAMASTE NONSENSE</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openBob"
+                        @mouseenter="previewProject('bob')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">BOB THE BLOB</span>
-                                <span class="text-sm">CHARACTER DESIGN</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openClickbuddy"
-                            @mouseenter="previewProject('clickbuddy')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">BOB THE BLOB</span>
+                            <span class="text-sm">CHARACTER DESIGN</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openClickbuddy"
+                        @mouseenter="previewProject('clickbuddy')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">CLICKBUDDY</span>
-                                <span class="text-sm"
-                                    >PRODUCT & BRAND DESIGN</span
-                                >
-                            </div>
-                        </li>
-                        <li
-                            @click="openNecoloco"
-                            @mouseenter="previewProject('necoloco')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">CLICKBUDDY</span>
+                            <span class="text-sm">PRODUCT & BRAND DESIGN</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openNecoloco"
+                        @mouseenter="previewProject('necoloco')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">NECOLOCO</span>
-                                <span class="text-sm">UI/UX</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openTwin"
-                            @mouseenter="previewProject('twin')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">NECOLOCO</span>
+                            <span class="text-sm">UI/UX</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openTwin"
+                        @mouseenter="previewProject('twin')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">DIGITAL TWIN</span>
-                                <span class="text-sm">3D MODELLING</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openThreed"
-                            @mouseenter="previewProject('threed')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">DIGITAL TWIN</span>
+                            <span class="text-sm">3D MODELLING</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openThreed"
+                        @mouseenter="previewProject('threed')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">PERSONAL WORK</span>
-                                <span class="text-sm">3D MODELLING</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openCorners"
-                            @mouseenter="previewProject('corners')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">PERSONAL WORK</span>
+                            <span class="text-sm">3D MODELLING</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openCorners"
+                        @mouseenter="previewProject('corners')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">ID CORNER FRAMES</span>
-                                <span class="text-sm">ILLUSTRATION</span>
-                            </div>
-                        </li>
-                        <li
-                            @click="openStory"
-                            @mouseenter="previewProject('story')"
-                            @mouseleave="clearPreview"
-                            class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                            <span class="text-lg">ID CORNER FRAMES</span>
+                            <span class="text-sm">ILLUSTRATION</span>
+                        </div>
+                    </li>
+                    <li
+                        @click="openStory"
+                        @mouseenter="previewProject('story')"
+                        @mouseleave="clearPreview"
+                        class="flex items-center gap-4 cursor-pointer group hover:scale-110 transition-transform duration-200 ease-in-out"
+                    >
+                        <img
+                            src="/static/elements/open-folder.svg"
+                            class="size-5 hidden group-hover:block"
+                            alt=""
+                        />
+                        <img
+                            src="/static/elements/closed-folder.svg"
+                            class="size-5 group-hover:hidden"
+                            alt=""
+                        />
+                        <div
+                            class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
                         >
-                            <img
-                                src="/static/elements/open-folder.svg"
-                                class="size-5 hidden group-hover:block"
-                                alt=""
-                            />
-                            <img
-                                src="/static/elements/closed-folder.svg"
-                                class="size-5 group-hover:hidden"
-                                alt=""
-                            />
-                            <div
-                                class="flex flex-col text-neutral-200 group-hover:text-white transition-colors ease-in-out"
-                            >
-                                <span class="text-lg">PERSONAL WORK</span>
-                                <span class="text-sm">STORYBOARD</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                            <span class="text-lg">PERSONAL WORK</span>
+                            <span class="text-sm">STORYBOARD</span>
+                        </div>
+                    </li>
+                </ul>
+
                 <!-- 3D Flip Card Preview -->
                 <div
                     class="order-1 lg:order-2 flex justify-center items-center lg:sticky lg:top-32 h-fit"
@@ -668,7 +665,7 @@
             </section>
             <section
                 id="about"
-                class="font-mono p-8 mt-64 text-justify sm:text-center flex justify-center items-center max-w-5xl text-lg md:text-4xl xl:text-5xl mx-auto h-[50vh]"
+                class="font-mono p-4 sm:p-8 mt-32 sm:mt-64 text-justify sm:text-center flex justify-center items-center max-w-5xl text-base sm:text-lg md:text-2xl lg:text-4xl xl:text-5xl mx-auto h-[50vh]"
             >
                 <p id="skills-text" class="cursor-default">
                     UI/UX DESIGN, GRAPHIC DESIGN, ILLUSTRATION, CHARACTER
@@ -677,7 +674,7 @@
                 </p>
             </section>
             <section
-                class="p-8 text-center flex justify-center items-center max-w-4xl mx-auto"
+                class="p-4 sm:p-8 text-center flex justify-center items-center max-w-4xl mx-auto text-sm sm:text-base"
             >
                 <p>
                     I'm a self-taught creative designer focused on crafting
@@ -701,26 +698,38 @@
                     <br />
                     If you'd like to connect or collaborate, feel free to reach
                     out at
-                    <a href="mailto:its.emilynxx@gmail.com" class="underline"
+                    <a
+                        href="mailto:its.emilynxx@gmail.com"
+                        class="underline break-all"
                         >its.emilynxx@gmail.com</a
                     >. I'm always open to new creative opportunities.
                 </p>
             </section>
             <section
                 id="contact"
-                class="font-mono p-8 text-center flex gap-10 flex-col justify-center items-center max-w-5xl text-3xl mx-auto h-[50vh]"
+                class="font-mono p-4 sm:p-8 text-center flex gap-6 sm:gap-10 flex-col justify-center items-center max-w-5xl text-xl sm:text-2xl md:text-3xl mx-auto h-[50vh]"
             >
-                <h2>YOU CAN FIND ME ON</h2>
-                <ul class="flex gap-10 font-display text-lg">
+                <h2 class="text-base sm:text-xl md:text-2xl lg:text-3xl">
+                    YOU CAN FIND ME ON
+                </h2>
+                <ul
+                    class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-10 font-display text-sm sm:text-base lg:text-lg break-all sm:break-normal"
+                >
                     <a
                         target="_blank"
                         href="https://linkedin.com/in/emily-yobal"
+                        class="hover:underline"
                         >LinkedIn</a
                     >
-                    <a href="mailto:its.emilynxx@gmail.com"
+                    <a
+                        href="mailto:its.emilynxx@gmail.com"
+                        class="hover:underline text-xs sm:text-sm lg:text-base"
                         >its.emilynxx@gmail.com</a
                     >
-                    <a target="_blank" href="https://instagram.com/emilynx_yob"
+                    <a
+                        target="_blank"
+                        href="https://instagram.com/emilynx_yob"
+                        class="hover:underline"
                         >Instagram</a
                     >
                 </ul>
