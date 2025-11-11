@@ -133,7 +133,7 @@
     {% import "components/story.html" as story %}
     {{ story.render() }}
     <body
-        class="bg-black scroll-smooth text-white font-display flex justify-center items-center min-h-[100dvh] relative overflow-x-hidden"
+        class="bg-black scroll-smooth text-white font-display flex justify-center items-center min-h-screen relative overflow-x-hidden"
         id="app"
     >
         <header
@@ -187,11 +187,11 @@
 
         <main class="relative z-10">
             <section
-                class="h-screen flex justify-center items-center max-w-7xl flex-col gap-4"
+                class="h-[100dvh] flex justify-center items-center max-w-7xl flex-col gap-4"
             >
                 <canvas
                     id="bg-canvas"
-                    class="absolute w-full h-full -z-10"
+                    class="absolute transform-gpu -z-10"
                 ></canvas>
 
                 <h1
