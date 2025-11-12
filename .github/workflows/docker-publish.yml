@@ -1,4 +1,4 @@
-name: Build and Push to GHCR
+name: Build, Push and Deploy
 
 on:
   push:
@@ -27,3 +27,18 @@ jobs:
         with:
           push: true
           tags: ghcr.io/barnacle322/emilyfolio:${{ github.ref_name }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy on DigitalOcean VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /apps/emi
+            source ./deploy.sh
