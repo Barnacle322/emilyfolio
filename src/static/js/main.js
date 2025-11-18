@@ -93,6 +93,8 @@ createApp({
             pointerUpHandler: null,
             blurHandler: null,
             resizeHandler: null,
+            bobVideoObserver: null,
+            bobVideoElements: [],
         };
     },
     components: {
@@ -107,6 +109,18 @@ createApp({
         Story,
     },
     delimiters: ["[[", "]]"],
+
+    watch: {
+        bob(isOpen) {
+            if (isOpen) {
+                this.$nextTick(() => {
+                    this.setupBobVideos();
+                });
+            } else {
+                this.teardownBobVideos();
+            }
+        },
+    },
 
     methods: {
         openAlbumCovers() {
@@ -244,6 +258,120 @@ createApp({
                     this.processAnimationQueue();
                 }, 800);
             }
+        },
+
+        setupBobVideos() {
+            this.teardownBobVideos();
+
+            const modal = document.querySelector('section[data-modal="bob"]');
+            if (!modal) {
+                return;
+            }
+
+            const videos = Array.from(
+                modal.querySelectorAll("video[data-bob-video]")
+            );
+
+            if (!videos.length) {
+                return;
+            }
+
+            const loadVideo = (video) => {
+                if (video.dataset.loaded === "true") {
+                    return;
+                }
+
+                const source = video.dataset.src;
+                if (!source) {
+                    return;
+                }
+
+                video.src = source;
+                video.load();
+                video.dataset.loaded = "true";
+            };
+
+            const playVideo = (video) => {
+                if (video.dataset.autoplay !== "true") {
+                    return;
+                }
+
+                const playPromise = video.play();
+                if (playPromise && typeof playPromise.catch === "function") {
+                    playPromise.catch(() => {});
+                }
+            };
+
+            const pauseVideo = (video) => {
+                if (!video.paused) {
+                    video.pause();
+                }
+            };
+
+            if (!("IntersectionObserver" in window)) {
+                videos.forEach((video) => {
+                    loadVideo(video);
+                    playVideo(video);
+                });
+
+                this.bobVideoElements = videos;
+                return;
+            }
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        const video = entry.target;
+                        if (entry.isIntersecting) {
+                            loadVideo(video);
+                            playVideo(video);
+                        } else {
+                            pauseVideo(video);
+                        }
+                    });
+                },
+                {
+                    root: modal,
+                    rootMargin: "15% 0px",
+                    threshold: 0.35,
+                }
+            );
+
+            videos.forEach((video) => {
+                if (video.dataset.priority === "true") {
+                    loadVideo(video);
+                    playVideo(video);
+                }
+
+                observer.observe(video);
+            });
+
+            this.bobVideoObserver = observer;
+            this.bobVideoElements = videos;
+        },
+
+        teardownBobVideos() {
+            if (this.bobVideoObserver) {
+                this.bobVideoObserver.disconnect();
+                this.bobVideoObserver = null;
+            }
+
+            if (!this.bobVideoElements || !this.bobVideoElements.length) {
+                this.bobVideoElements = [];
+                return;
+            }
+
+            this.bobVideoElements.forEach((video) => {
+                video.pause();
+
+                if (video.dataset.src) {
+                    video.removeAttribute("src");
+                    video.load();
+                    video.dataset.loaded = "";
+                }
+            });
+
+            this.bobVideoElements = [];
         },
 
         initBackground() {
@@ -620,6 +748,8 @@ createApp({
     },
 
     beforeUnmount() {
+        this.teardownBobVideos();
+
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
