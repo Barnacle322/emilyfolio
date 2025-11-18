@@ -281,12 +281,28 @@ createApp({
                     return;
                 }
 
-                const source = video.dataset.src;
-                if (!source) {
+                const sourceElements = Array.from(
+                    video.querySelectorAll("source[data-src]")
+                );
+
+                if (sourceElements.length) {
+                    sourceElements.forEach((sourceEl) => {
+                        if (!sourceEl.dataset.src) {
+                            return;
+                        }
+                        sourceEl.src = sourceEl.dataset.src;
+                    });
+                    video.load();
+                    video.dataset.loaded = "true";
                     return;
                 }
 
-                video.src = source;
+                const fallbackSource = video.dataset.src;
+                if (!fallbackSource) {
+                    return;
+                }
+
+                video.src = fallbackSource;
                 video.load();
                 video.dataset.loaded = "true";
             };
@@ -364,11 +380,24 @@ createApp({
             this.bobVideoElements.forEach((video) => {
                 video.pause();
 
-                if (video.dataset.src) {
-                    video.removeAttribute("src");
-                    video.load();
-                    video.dataset.loaded = "";
+                const sourceElements = Array.from(
+                    video.querySelectorAll("source[data-src]")
+                );
+
+                if (sourceElements.length) {
+                    sourceElements.forEach((sourceEl) => {
+                        if (sourceEl.hasAttribute("src")) {
+                            sourceEl.removeAttribute("src");
+                        }
+                    });
                 }
+
+                if (video.hasAttribute("src")) {
+                    video.removeAttribute("src");
+                }
+
+                video.load();
+                video.dataset.loaded = "";
             });
 
             this.bobVideoElements = [];
