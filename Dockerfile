@@ -18,4 +18,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 EXPOSE 80
 
 # Launch with Granian
-CMD ["uv", "run", "granian", "--interface", "wsgi", "--port", "80", "--host", "0.0.0.0", "--workers", "5", ".:application"]
+CMD ["uv", "run", "granian", "--interface", "wsgi", "--port", "80", "--host", "0.0.0.0", "--workers", "2", ".:application"]
