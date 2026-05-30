@@ -32,8 +32,5 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Coolify Deployment
-        run: |
-          curl --request GET '${{ secrets.COOLIFY_WEBHOOK }}' \
-               --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}' \
-               --fail-with-body
+      - name: Trigger Dokploy deployment
+        run: curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }}
